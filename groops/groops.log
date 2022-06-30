@@ -1,0 +1,11 @@
+2022-06-28 16:11:12 Status  === Starting GROOPS with 4 processes ===
+2022-06-28 16:11:12 Info    Config file: <orbit_propa_20200729.xml>
+2022-06-28 16:11:12 Status  --- SimulateOrbit (/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/temp_C_2020-07-29.txt) ---
+2022-06-28 16:11:20 Status  integrating orbit
+2022-06-28 16:53:40 Status  43199 loops in time 00:42:17
+2022-06-28 16:53:40 Status  write orbit data to file </home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/temp_C_2020-07-29.txt>
+2022-06-28 16:53:58 Status  --- SimulateOrbit (/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/temp_D_2020-07-29.txt) ---
+2022-06-28 16:54:00 Status  integrating orbit
+2022-06-28 17:27:11 Status  43199 loops in time 00:33:09
+2022-06-28 17:27:11 Status  write orbit data to file </home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/temp_D_2020-07-29.txt>
+2022-06-28 17:27:28 Status  === Finished GROOPS ===
