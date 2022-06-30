@@ -17,14 +17,14 @@ def lpsd(x, windowfcn, fmin, fmax, Jdes, Kdes, Kmin, fs, xi):
     to the variables in the paper; and the corresponding equation numbers
     are indicated in the comments.
     References:
-      [1] Michael Tröbs and Gerhard Heinzel, "Improved spectrum estimation
-      from digitized time series on a logarithmic frequency axis," in
-      Measurement, vol 39 (2006), pp 120-129.
-        * http://dx.doi.org/10.1016/j.measurement.2005.10.010
-        * http://pubman.mpdl.mpg.de/pubman/item/escidoc:150688:1
-      [2] Michael Tröbs and Gerhard Heinzel, Corrigendum to "Improved
-      spectrum estimation from digitized time series on a logarithmic
-      frequency axis."
+        [1] Michael Tröbs and Gerhard Heinzel, "Improved spectrum estimation
+        from digitized time series on a logarithmic frequency axis," in
+        Measurement, vol 39 (2006), pp 120-129.
+            * http://dx.doi.org/10.1016/j.measurement.2005.10.010
+            * http://pubman.mpdl.mpg.de/pubman/item/escidoc:150688:1
+        [2] Michael Tröbs and Gerhard Heinzel, Corrigendum to "Improved
+        spectrum estimation from digitized time series on a logarithmic
+        frequency axis."
     Author(s): Tobin Fricke <tobin.fricke@ligo.org> 2012-04-17
     :param x: time series to be transformed. "We assume to have a long stream x(n), n=0, ..., N-1 of equally spaced
         input data sampled with frequency fs. Typical values for N range from 10^4 to >10^6" - Section 8 of [1]
@@ -197,6 +197,8 @@ def rr2lgd(rr, fs):
 
 def main():
 
+    # the starting epoch of the short arc on 2020-07-29 is 10631 [2s sampling]
+
     # Bangladesh in latitude and longitude
     bang = np.asarray([7.08123588e-10, 11564535.81122418, 5374575.99816614])
 
@@ -230,12 +232,18 @@ def main():
     lgd = rr2lgd(rr, fs)
     plt.plot(lgd)
     plt.plot(lgd_out[:, 2])
+    ax.tick_params(labelsize=25, width=2.9)
+    ax.yaxis.get_offset_text().set_fontsize(24)
+    ax.legend(fontsize=15, loc='best', frameon=False)
+    ax.set_ylabel(r'LGD [m/s$^2\sqrt{Hz}$]', fontsize=20)
+    ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+    plt.setp(ax.spines.values(), linewidth=3)
 
-    # fig, ax = plt.subplots(figsize=(10, 5))  # 2020-07-29
-    # plt.plot(butter_highpass_filter(lri_x[2*5400: 2*5400+1500, 2] - range_rate_pod[2*5400: 2*5400+1500, 0], 3e-3, fs))
     fig, ax = plt.subplots(figsize=(10, 5))  # 2020-07-29
-    plt.plot(latlon[:, 0], lgd[10635: 10635+1420: 5], label="self")
-    plt.plot(latlon[:, 0], lgd_out[10635: 10635+1420: 5, 0], label="released(open-access)")
+    plt.plot(latlon[:, 0], lgd[10631: 10631+1420: 5], label="self")
+    plt.plot(latlon[:, 0], lgd_out[10631: 10631+1420: 5, 0], label="released(open-access)")
+    pod_c_arc = pod_c[10631: 10631+1420]
+    pod_d_arc = pod_d[10631: 10631+1420]
     ax.tick_params(labelsize=25, width=2.9)
     ax.set_xlabel('纬度 [deg]', fontsize=20)
     ax.yaxis.get_offset_text().set_fontsize(24)
@@ -243,6 +251,7 @@ def main():
     ax.set_ylabel(r'LGD [m/s$^2\sqrt{Hz}$]', fontsize=20)
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
+
     # fig, ax = plt.subplots(figsize=(10, 5))  # 2021-07-21
     # plt.plot(latlon[:, 0], lgd[24880: 24880+1420: 5])
     # ax.tick_params(labelsize=25, width=2.9)
