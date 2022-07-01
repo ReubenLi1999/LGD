@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from lpsd import lpsd_trad
 from scipy.signal import welch, butter, filtfilt, windows, kaiserord, firwin
 from scipy.fftpack import rfft, irfft, fftfreq
 
@@ -121,8 +120,6 @@ def lpsd(x, windowfcn, fmin, fmax, Jdes, Kdes, Kmin, fs, xi):
 
         # Remove the mean of each segment.
         data = data - np.mean(data, axis=0)  # (4) & (5)
-        if jj == 0:
-            print(np.mean(data))
 
         # Compute the discrete Fourier transform
         window = windowfcn(L[jj]+2)[1:-1]  # (5) #signal.hann is equivalent to Matlab hanning, however, the first and the last elements are zeros, need to be removed
@@ -155,7 +152,6 @@ def kaiser(x, fq, cutoff_hz, ripple_db=600.):
 
     # compute the kaiser parameter for the fir filter
     n, beta = kaiserord(ripple_db, width)
-    print('The length of the lowpass filter is ', n, '.')
 
     # use firwin with a kaiser window
     taps = firwin(n,
@@ -228,7 +224,11 @@ def soil_moisture(lat_span, lon_span):
     lat = np.loadtxt("../input/2020-07-29/lat.csv", delimiter=",")
     lon = np.loadtxt("../input/2020-07-29/lon.csv", delimiter=",")
     som = np.loadtxt("../input/2020-07-29/SoilMoi40_100cm_inst.csv", delimiter=",")
-    som = som[np.where(np.logical_and(lat>=lat_span[0], lat<=lat_span[1])), :]
+    som_insitu = som[np.where(np.logical_and(lat>=lat_span[0], lat<=lat_span[1])), :][0]
+    som_insitu = som_insitu[:, np.where(np.logical_and(lon>=lon_span[0], lon<=lon_span[1]))[0]]
+
+    # area for each segment
+    area = 0.25*0.25*111000*111000
 
 
 def main():
