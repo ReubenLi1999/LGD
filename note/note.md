@@ -12,5 +12,5 @@ $$
 $$
 LGD是双星重力矢量差在星间连线方向的投影：
 $$
-\delta \boldsymbol{a}^{LOS}_{12}=\boldsymbol{e}_{12}\cdot\delta \boldsymbol{a}_{12}(t)=\boldsymbol{e}_{12}\cdot G\sum_{i=1}^N(\boldsymbol{f}_{1,i} - \boldsymbol{f}_{2,i})\delta m_i(t)=\boldsymbol{e}_{12}\cdot G(\boldsymbol{F}_1(t) - \boldsymbol{F}_2(t)) \delta \boldsymbol{m}(t)
+\delta \boldsymbol{a}^{LOS}_{12}=\boldsymbol{e}_{12}(t)\cdot\delta \boldsymbol{a}_{12}(t)=\boldsymbol{e}_{12}(t)\cdot G\sum_{i=1}^N(\boldsymbol{f}_{1,i} - \boldsymbol{f}_{2,i})\delta m_i(t)=\boldsymbol{e}_{12}(t)\cdot G(\boldsymbol{F}_1(t) - \boldsymbol{F}_2(t)) \delta \boldsymbol{m}(t)
 $$
