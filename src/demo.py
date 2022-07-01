@@ -187,7 +187,8 @@ def rr2lgd(rr, fs):
     ra = np.gradient(rr) * fs
     w = fftfreq(ra.size, d=1/fs)
     f_signal = rfft(ra)
-    lgd_filter = 0.000345 * w**(-1.04) + 1
+    lgd_filter = np.zeros(w.size)
+    lgd_filter[1: ] = 0.000345 * np.power(w[1: ], -1.04) + 1
     lgd_filter[(w < 1e-3)] = 1
     filtered = f_signal * lgd_filter
     cut = irfft(filtered)
@@ -195,18 +196,55 @@ def rr2lgd(rr, fs):
     return cut
 
 
+def lgd2mass(source_locations, coor_c, coor_d, los, lgd):
+
+    # assignment, and the symbols in this function is in align with ones in the note
+    q = source_locations
+    r_1 = coor_c[:, 0: 3]
+    r_2 = coor_d[:, 0: 3]
+    e = los
+
+    # constant
+    G = 6.6743e-11
+    e = G * e
+
+    # f loop
+    mass = np.zeros([los.__len__(), q.__len__()])
+    for id_r, (r_1_j, r_2_j, e_j, lgd_j) in enumerate(zip(r_1, r_2, e, lgd)):
+        f_1 = np.zeros([q.__len__(), 3])
+        f_2 = np.zeros([q.__len__(), 3])
+        a = np.zeros([q.__len__(), 1])
+        for id_q, q_i in enumerate(q):
+            f_1[id_q, :] = (q_i - r_1_j) / np.linalg.norm(q_i - r_1_j)**3
+            f_2[id_q, :] = (q_i - r_2_j) / np.linalg.norm(q_i - r_2_j)**3
+            a[id_q] = np.dot(e_j, f_1[id_q, :] - f_2[id_q, :])
+        mass[id_r, :] = lgd_j / a
+
+    return mass
+
+
+def soil_moisture(lat_span, lon_span):
+    # soil moisture in kg*m^-2
+    lat = np.loadtxt("../input/2020-07-29/lat.csv", delimiter=",")
+    lon = np.loadtxt("../input/2020-07-29/lon.csv", delimiter=",")
+    som = np.loadtxt("../input/2020-07-29/SoilMoi40_100cm_inst.csv", delimiter=",")
+    som = som[np.where(np.logical_and(lat>=lat_span[0], lat<=lat_span[1])), :]
+
+
 def main():
 
     # the starting epoch of the short arc on 2020-07-29 is 10631 [2s sampling]
 
     # Bangladesh in latitude and longitude
-    bang = np.asarray([7.08123588e-10, 11564535.81122418, 5374575.99816614])
+    bang = np.asarray([[3.59686092e-10, 5874119.6544634, 2476724.01886489]])
 
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
     plt.rcParams["axes.unicode_minus"] = False
     lri_x = np.loadtxt("../input/2020-07-29/LRI1B_2020-07-29_Y_04.txt", dtype=np.longdouble, skiprows=0)
     pod_c = np.loadtxt("../output/temp_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
     pod_d = np.loadtxt("../output/temp_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    gnv_c = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
+    gnv_d = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     lgd_out = np.loadtxt("../input/2020-07-29/lgd20200729", dtype=np.longdouble)
     latlon = np.loadtxt("../input/2020-07-29/coor_2020-07-29.txt", dtype=np.longdouble)
 
@@ -242,8 +280,10 @@ def main():
     fig, ax = plt.subplots(figsize=(10, 5))  # 2020-07-29
     plt.plot(latlon[:, 0], lgd[10631: 10631+1420: 5], label="self")
     plt.plot(latlon[:, 0], lgd_out[10631: 10631+1420: 5, 0], label="released(open-access)")
-    pod_c_arc = pod_c[10631: 10631+1420]
-    pod_d_arc = pod_d[10631: 10631+1420]
+    pod_c_arc = gnv_c[10631: 10631+1420]
+    pod_d_arc = gnv_d[10631: 10631+1420]
+    los_arc = los[10631: 10631+1420]
+    lgd_arc = lgd[10631: 10631+1420]
     ax.tick_params(labelsize=25, width=2.9)
     ax.set_xlabel('纬度 [deg]', fontsize=20)
     ax.yaxis.get_offset_text().set_fontsize(24)
@@ -270,46 +310,16 @@ def main():
     # ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     # plt.setp(ax.spines.values(), linewidth=3)
 
+    # mass of sources
+    mass = lgd2mass(bang, pod_c_arc, pod_d_arc, los_arc, lgd_arc)
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.loglog(freq_lri_x_range,
-                 np.sqrt(psd_lri_x_range),
-                 linewidth=4,
-                 label='lri-range',
-                 color='xkcd:aqua',)
-    ax.loglog(freq_pod_x_range,
-                 np.sqrt(psd_pod_x_range),
-                 linewidth=4,
-                 label='lri-range-residual',
-                 color='#9C27B0',)
-    ax.tick_params(labelsize=25, width=2.9)
-    ax.set_xlabel('频率 [Hz]', fontsize=20)
-    ax.yaxis.get_offset_text().set_fontsize(24)
-    ax.set_ylabel(r'ASD [m/$\sqrt{Hz}$]', fontsize=20)
-    ax.legend(fontsize=15, loc='best', frameon=False)
-    ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
-    plt.setp(ax.spines.values(), linewidth=3)
-    plt.tight_layout()
+    ax.plot(latlon[:, 0], mass[::5])
+    ax.set_xlim([0, 90])
+    ax.set_ylim([0, 5e14])
+    soil_moisture([22, 26], [88, 92])
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.loglog(freq_lri_x_rate,
-                 np.sqrt(psd_lri_x_rate),
-                 linewidth=4,
-                 label='lri-range-rate',
-                 color='xkcd:aqua',)
-    ax.loglog(freq_pod_x_rate,
-                 np.sqrt(psd_pod_x_rate) ,
-                 linewidth=4,
-                 label='lri-range-rate-residual',
-                 color='#9C27B0',)
-    ax.tick_params(labelsize=25, width=2.9)
-    ax.set_xlabel('频率 [Hz]', fontsize=20)
-    ax.yaxis.get_offset_text().set_fontsize(24)
-    ax.set_ylabel(r'ASD [m/s/$\sqrt{Hz}$]', fontsize=20)
-    ax.legend(fontsize=15, loc='best', frameon=False)
-    ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
-    plt.setp(ax.spines.values(), linewidth=3)
-    plt.tight_layout()
 
+    # ASD of LGD
     X, f, C = lpsd(lgd, windows.nuttall, 1e-4, 2e-1, 400, 100, 2, fs, 0.5)
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.loglog(f,
@@ -326,7 +336,47 @@ def main():
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
     plt.tight_layout()
-    plt.show()
+    # plt.show()
+
+    # fig, ax = plt.subplots(figsize=(10, 5))
+    # ax.loglog(freq_lri_x_range,
+    #              np.sqrt(psd_lri_x_range),
+    #              linewidth=4,
+    #              label='lri-range',
+    #              color='xkcd:aqua',)
+    # ax.loglog(freq_pod_x_range,
+    #              np.sqrt(psd_pod_x_range),
+    #              linewidth=4,
+    #              label='lri-range-residual',
+    #              color='#9C27B0',)
+    # ax.tick_params(labelsize=25, width=2.9)
+    # ax.set_xlabel('频率 [Hz]', fontsize=20)
+    # ax.yaxis.get_offset_text().set_fontsize(24)
+    # ax.set_ylabel(r'ASD [m/$\sqrt{Hz}$]', fontsize=20)
+    # ax.legend(fontsize=15, loc='best', frameon=False)
+    # ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+    # plt.setp(ax.spines.values(), linewidth=3)
+    # plt.tight_layout()
+
+    # fig, ax = plt.subplots(figsize=(10, 5))
+    # ax.loglog(freq_lri_x_rate,
+    #              np.sqrt(psd_lri_x_rate),
+    #              linewidth=4,
+    #              label='lri-range-rate',
+    #              color='xkcd:aqua',)
+    # ax.loglog(freq_pod_x_rate,
+    #              np.sqrt(psd_pod_x_rate) ,
+    #              linewidth=4,
+    #              label='lri-range-rate-residual',
+    #              color='#9C27B0',)
+    # ax.tick_params(labelsize=25, width=2.9)
+    # ax.set_xlabel('频率 [Hz]', fontsize=20)
+    # ax.yaxis.get_offset_text().set_fontsize(24)
+    # ax.set_ylabel(r'ASD [m/s/$\sqrt{Hz}$]', fontsize=20)
+    # ax.legend(fontsize=15, loc='best', frameon=False)
+    # ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+    # plt.setp(ax.spines.values(), linewidth=3)
+    # plt.tight_layout()
 
 
 if __name__ == "__main__":
