@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import welch, butter, filtfilt, windows, kaiserord, firwin
 from scipy.fftpack import rfft, irfft, fftfreq
+from pyproj import Geod
+import astropy.coordinates as ac
+from astropy import units as u
+from astropy.time import Time
+from scipy.sparse.linalg import lsqr
 
 
 def lpsd(x, windowfcn, fmin, fmax, Jdes, Kdes, Kmin, fs, xi):
@@ -192,13 +197,36 @@ def rr2lgd(rr, fs):
     return cut
 
 
-def lgd2mass(source_locations, coor_c, coor_d, los, lgd):
+def lgd2mass(source_locations, coor_c, coor_d, los, lgd, lat, flag):
 
-    # assignment, and the symbols in this function is in align with ones in the note
-    q = source_locations
+    # resample
+    source_lat = source_locations[:, 0].reshape(41, 6)  # resample
+    source_lat = source_lat[::4, ::2]
+    source_lon = source_locations[:, 1].reshape(41, 6)  # resample
+    source_lon = source_lon[::4, ::2]
+    source_locations = np.c_[source_lat.reshape(source_lat.shape[0]*source_lat.shape[1], 1),
+                             source_lon.reshape(source_lon.shape[0]*source_lon.shape[1], 1)]
+    # fig, ax = plt.subplots(figsize=(16, 8))
+    # plt.scatter(source_locations[:, 1], source_locations[:, 0])
+    # plt.show()
+
+    # convert geocentric to itrs
+    itrs = ac.ITRS(ac.WGS84GeodeticRepresentation(ac.Longitude(source_locations[:, 1], unit=u.degree),
+                                                  ac.Latitude(source_locations[:, 0], unit=u.degree),
+                                                  u.Quantity(12, unit=u.m)),
+                   obstime=Time("2000-01-01T00:00:00"))
+    q = ac.EarthLocation(*itrs.cartesian.xyz)
     r_1 = coor_c[:, 0: 3]
     r_2 = coor_d[:, 0: 3]
     e = los
+
+    # arc for computation
+    if flag == "a":
+        sta = np.argmax(lat > 22.5)
+        end = np.argmin(lat < 27)
+    else:
+        end = np.argmin(lat > 22.5)
+        sta = np.argmax(lat < 27)
 
     # constant
     G = 6.6743e-11
@@ -211,29 +239,55 @@ def lgd2mass(source_locations, coor_c, coor_d, los, lgd):
         f_2 = np.zeros([q.__len__(), 3])
         a = np.zeros([q.__len__(), 1])
         for id_q, q_i in enumerate(q):
+            q_i = np.asarray([q_i.x.value, q_i.y.value, q_i.z.value])
             f_1[id_q, :] = (q_i - r_1_j) / np.linalg.norm(q_i - r_1_j)**3
             f_2[id_q, :] = (q_i - r_2_j) / np.linalg.norm(q_i - r_2_j)**3
-            a[id_q] = np.dot(e_j, f_1[id_q, :] - f_2[id_q, :])
-        mass[id_r, :] = lgd_j / a
+            mass[id_r, id_q] = np.dot(e_j, f_1[id_q, :] - f_2[id_q, :])
 
-    return mass
+    m = lsqr(mass[sta: end, :], lgd[sta: end])[0]
+
+    return np.sum(m)
 
 
-def soil_moisture(lat_span, lon_span):
+def soil_moisture(lat_span, lon_span, flag):
     # soil moisture in kg*m^-2
     lat = np.loadtxt("../input/2020-07-29/lat.csv", delimiter=",")
     lon = np.loadtxt("../input/2020-07-29/lon.csv", delimiter=",")
-    som = np.loadtxt("../input/2020-07-29/SoilMoi40_100cm_inst.csv", delimiter=",")
+    if flag == "a":
+        som_1 = np.loadtxt("../input/2020-07-29/SoilMoi0_10cm_inst.csv", delimiter=",")
+        som_2 = np.loadtxt("../input/2020-07-29/SoilMoi10_40cm_inst.csv", delimiter=",")
+        som_3 = np.loadtxt("../input/2020-07-29/SoilMoi40_100cm_inst.csv", delimiter=",")
+        som_4 = np.loadtxt("../input/2020-07-29/SoilMoi100_200cm_inst.csv", delimiter=",")
+    else:
+        som_1 = np.loadtxt("../input/2020-07-29/SoilMoi0_10cm_inst_de.csv", delimiter=",")
+        som_2 = np.loadtxt("../input/2020-07-29/SoilMoi10_40cm_inst_de.csv", delimiter=",")
+        som_3 = np.loadtxt("../input/2020-07-29/SoilMoi40_100cm_inst_de.csv", delimiter=",")
+        som_4 = np.loadtxt("../input/2020-07-29/SoilMoi100_200cm_inst_de.csv", delimiter=",")
+    som = som_1 + som_2 + som_3 + som_4
     som_insitu = som[np.where(np.logical_and(lat>=lat_span[0], lat<=lat_span[1])), :][0]
     som_insitu = som_insitu[:, np.where(np.logical_and(lon>=lon_span[0], lon<=lon_span[1]))[0]]
-
+    lat_insitu = lat[np.where(np.logical_and(lat>=lat_span[0], lat<=lat_span[1]))[0]]
+    lon_insitu = lon[np.where(np.logical_and(lon>=lon_span[0], lon<=lon_span[1]))[0]]
+    # define wgs84 as crs
+    geod = Geod('+a=6378137 +f=0.0033528106647475126')
     # area for each segment
-    area = 0.25*0.25*111000*111000
+    res = []
+    for id_lat, lat in enumerate(lat_insitu):
+        for id_lon, lon in enumerate(lon_insitu):
+            if not np.isnan(som_insitu[id_lat, id_lon]):
+                lat_small = lat - 0.125
+                lat_large = lat + 0.125
+                lon_small = lon - 0.125
+                lon_large = lon + 0.125
+                area, perim = geod.polygon_area_perimeter([lon_large, lon_large, lon_small, lon_small],
+                                                          [lat_large, lat_small, lat_small, lat_large])
+                res.append([lat, lon, abs(area) * som_insitu[id_lat, id_lon]])
+    return np.asarray(res)
 
 
-def main():
+def ascending():
 
-    # the starting epoch of the short arc on 2020-07-29 is 10631 [2s sampling]
+    # the starting epoch of the short arc on 2020-07-29 is 10629 [2s sampling]
 
     # Bangladesh in latitude and longitude
     bang = np.asarray([[3.59686092e-10, 5874119.6544634, 2476724.01886489]])
@@ -246,7 +300,7 @@ def main():
     gnv_c = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     gnv_d = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     lgd_out = np.loadtxt("../input/2020-07-29/lgd20200729", dtype=np.longdouble)
-    latlon = np.loadtxt("../input/2020-07-29/coor_2020-07-29.txt", dtype=np.longdouble)
+    latlon = np.loadtxt("../input/2020-07-29/coor_2020-07-29_ascend.txt", dtype=np.longdouble)
 
     vec_rela = pod_c[:, 4: 7] - pod_d[:, 4: 7]
     pos_rela = pod_c[:, 1: 4] - pod_d[:, 1: 4]
@@ -265,7 +319,7 @@ def main():
     freq_pod_x_range, psd_pod_x_range = welch(lri_x[:, 1] - dis[:, 0], fs, ('kaiser', 30.), lri_x.__len__(), scaling='density')
     freq_pod_x_rate, psd_pod_x_rate = welch(lri_x[:, 2] - range_rate_pod[:, 0], fs, ('kaiser', 30.), lri_x.__len__(), scaling='density')
 
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(16, 8))
     rr = lri_x[:, 2] - range_rate_pod[:, 0]
     lgd = rr2lgd(rr, fs)
     plt.plot(lgd)
@@ -277,13 +331,13 @@ def main():
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
 
-    fig, ax = plt.subplots(figsize=(10, 5))  # 2020-07-29
-    plt.plot(latlon[:, 0], lgd[10631: 10631+1420: 5], label="self")
-    plt.plot(latlon[:, 0], lgd_out[10631: 10631+1420: 5, 0], label="released(open-access)")
-    pod_c_arc = gnv_c[10631: 10631+1420]
-    pod_d_arc = gnv_d[10631: 10631+1420]
-    los_arc = los[10631: 10631+1420]
-    lgd_arc = lgd[10631: 10631+1420]
+    fig, ax = plt.subplots(figsize=(16, 8))  # 2020-07-29
+    plt.plot(latlon[:, 0], lgd[10629: 10629+1421], label="self")
+    plt.plot(latlon[:, 0], lgd_out[10629: 10629+1421, 0], label="released(open-access)")
+    pod_c_arc = gnv_c[10629: 10629+1421]
+    pod_d_arc = gnv_d[10629: 10629+1421]
+    los_arc = los[10629: 10629+1421]
+    lgd_arc = lgd[10629: 10629+1421]
     ax.tick_params(labelsize=25, width=2.9)
     ax.set_xlabel('纬度 [deg]', fontsize=20)
     ax.yaxis.get_offset_text().set_fontsize(24)
@@ -292,7 +346,7 @@ def main():
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
 
-    # fig, ax = plt.subplots(figsize=(10, 5))  # 2021-07-21
+    # fig, ax = plt.subplots(figsize=(16, 8))  # 2021-07-21
     # plt.plot(latlon[:, 0], lgd[24880: 24880+1420: 5])
     # ax.tick_params(labelsize=25, width=2.9)
     # ax.set_xlabel('纬度 [deg]', fontsize=20)
@@ -301,7 +355,7 @@ def main():
     # ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     # plt.setp(ax.spines.values(), linewidth=3)
 
-    # fig, ax = plt.subplots(figsize=(10, 5))  # 2021-03-22
+    # fig, ax = plt.subplots(figsize=(16, 8))  # 2021-03-22
     # plt.plot(latlon[:, 0], lgd[36415: 36415+1415])
     # ax.tick_params(labelsize=25, width=2.9)
     # ax.set_xlabel('纬度 [deg]', fontsize=20)
@@ -311,17 +365,14 @@ def main():
     # plt.setp(ax.spines.values(), linewidth=3)
 
     # mass of sources
-    mass = lgd2mass(bang, pod_c_arc, pod_d_arc, los_arc, lgd_arc)
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(latlon[:, 0], mass[::5])
-    ax.set_xlim([0, 90])
-    ax.set_ylim([0, 5e14])
-    soil_moisture([22, 26], [88, 92])
-
+    solm = soil_moisture([22, 26], [88, 92], "a")
+    print("Mass of soil moisture: ", np.sum(solm[:, 2]), "kg.")
+    mass = lgd2mass(solm[:, :2], pod_c_arc, pod_d_arc, los_arc, lgd_arc, latlon[:, 0], "a")
+    print(mass - np.sum(solm[:, 2]))
 
     # ASD of LGD
     X, f, C = lpsd(lgd, windows.nuttall, 1e-4, 2e-1, 400, 100, 2, fs, 0.5)
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(16, 8))
     ax.loglog(f,
                 np.sqrt(X*C['PSD']) * 1e9,
                 linewidth=4,
@@ -338,7 +389,7 @@ def main():
     plt.tight_layout()
     # plt.show()
 
-    # fig, ax = plt.subplots(figsize=(10, 5))
+    # fig, ax = plt.subplots(figsize=(16, 8))
     # ax.loglog(freq_lri_x_range,
     #              np.sqrt(psd_lri_x_range),
     #              linewidth=4,
@@ -358,7 +409,7 @@ def main():
     # plt.setp(ax.spines.values(), linewidth=3)
     # plt.tight_layout()
 
-    # fig, ax = plt.subplots(figsize=(10, 5))
+    # fig, ax = plt.subplots(figsize=(16, 8))
     # ax.loglog(freq_lri_x_rate,
     #              np.sqrt(psd_lri_x_rate),
     #              linewidth=4,
@@ -379,5 +430,57 @@ def main():
     # plt.tight_layout()
 
 
+def descending():
+
+    # the starting epoch of the short arc on 2020-07-29 is 31904 [2s sampling]
+    plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
+    plt.rcParams["axes.unicode_minus"] = False
+    lri_x = np.loadtxt("../input/2020-07-29/LRI1B_2020-07-29_Y_04.txt", dtype=np.longdouble, skiprows=0)
+    pod_c = np.loadtxt("../output/temp_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_d = np.loadtxt("../output/temp_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    gnv_c = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
+    gnv_d = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
+    lgd_out = np.loadtxt("../input/2020-07-29/lgd20200729", dtype=np.longdouble)
+    latlon = np.loadtxt("../input/2020-07-29/coor_2020-07-29_descend.txt", dtype=np.longdouble)
+
+    vec_rela = pod_c[:, 4: 7] - pod_d[:, 4: 7]
+    pos_rela = pod_c[:, 1: 4] - pod_d[:, 1: 4]
+    dis = np.zeros([pos_rela.__len__(), 1])
+    los = np.zeros([pos_rela.__len__(), 3])
+    range_rate_pod = np.zeros([pos_rela.__len__(), 1])
+    for index, e in enumerate(pos_rela):
+        dis[index] = np.sqrt(pos_rela[index, 0]**2 + pos_rela[index, 1]**2 + pos_rela[index, 2]**2)
+        los[index, :] = pos_rela[index, :] / dis[index]
+        range_rate_pod[index] = np.dot(vec_rela[index, :], los[index, :])
+
+    fs = 0.5
+    rr = lri_x[:, 2] - range_rate_pod[:, 0]
+    lgd = rr2lgd(rr, fs)
+
+    fig, ax = plt.subplots(figsize=(16, 8))  # 2020-07-29
+    plt.plot(latlon[:, 0], lgd[31904: 31904+1419], label="self")
+    plt.plot(latlon[:, 0], lgd_out[31904: 31904+1419, 0], label="released(open-access)")
+    pod_c_arc = gnv_c[31904: 31904+1419]
+    pod_d_arc = gnv_d[31904: 31904+1419]
+    los_arc = los[31904: 31904+1419]
+    lgd_arc = lgd[31904: 31904+1419]
+    ax.tick_params(labelsize=25, width=2.9)
+    ax.set_xlabel('纬度 [deg]', fontsize=20)
+    ax.yaxis.get_offset_text().set_fontsize(24)
+    ax.legend(fontsize=15, loc='best', frameon=False)
+    ax.set_ylabel(r'LGD [m/s$^2\sqrt{Hz}$]', fontsize=20)
+    ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+    plt.setp(ax.spines.values(), linewidth=3)
+    plt.tight_layout()
+    # plt.show()
+
+    # mass of sources
+    solm = soil_moisture([22, 26], [88, 92], "d")
+    print("Mass of soil moisture: ", np.sum(solm[:, 2]), "kg.")
+    mass = lgd2mass(solm[:, :2], pod_c_arc, pod_d_arc, los_arc, lgd_arc, latlon[:, 0], "d")
+    print(mass - np.sum(solm[:, 2]))
+
+
 if __name__ == "__main__":
-    main()
+    ascending()
+    descending()
