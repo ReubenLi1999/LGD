@@ -295,8 +295,8 @@ def ascending():
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
     plt.rcParams["axes.unicode_minus"] = False
     lri_x = np.loadtxt("../input/2020-07-29/LRI1B_2020-07-29_Y_04.txt", dtype=np.longdouble, skiprows=0)
-    pod_c = np.loadtxt("../output/ddk7_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
-    pod_d = np.loadtxt("../output/ddk7_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_c = np.loadtxt("../output/temp_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_d = np.loadtxt("../output/temp_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
     gnv_c = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     gnv_d = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     lgd_out = np.loadtxt("../input/2020-07-29/lgd20200729", dtype=np.longdouble)
@@ -320,7 +320,7 @@ def ascending():
     freq_pod_x_rate, psd_pod_x_rate = welch(lri_x[:, 2] - range_rate_pod[:, 0], fs, ('kaiser', 30.), lri_x.__len__(), scaling='density')
 
     fig, ax = plt.subplots(figsize=(16, 8))
-    rr = lri_x[:, 2] - range_rate_pod[:, 0]
+    rr = lri_x[:, 2] - range_rate_pod[:, 0] - lri_x[:, 4]
     lgd = rr2lgd(rr, fs)
     plt.plot(lgd)
     plt.plot(lgd_out[:, 2])
@@ -438,8 +438,8 @@ def descending():
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
     plt.rcParams["axes.unicode_minus"] = False
     lri_x = np.loadtxt("../input/2020-07-29/LRI1B_2020-07-29_Y_04.txt", dtype=np.longdouble, skiprows=0)
-    pod_c = np.loadtxt("../output/ddk7_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
-    pod_d = np.loadtxt("../output/ddk7_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_c = np.loadtxt("../output/temp_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_d = np.loadtxt("../output/temp_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
     gnv_c = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     gnv_d = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     lgd_out = np.loadtxt("../input/2020-07-29/lgd20200729", dtype=np.longdouble)
@@ -485,4 +485,4 @@ def descending():
 
 if __name__ == "__main__":
     ascending()
-    descending()
+    # descending()
