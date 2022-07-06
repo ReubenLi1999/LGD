@@ -14,9 +14,9 @@
 			<inputfile>{workspace}/input/2020-07-02/AOD1B_2020-07-02_X_06.asc</inputfile>
 		</GraceAod2TimeSplines>
 	</program>
-	<program comment="{workspace}/output/temp_C_2020-07-02.txt">
+	<program comment="{workspace}/output/ddk7_D_2020-07-02.txt">
 		<SimulateOrbit>
-			<outputfileOrbit>{workspace}/output/temp_C_2020-07-02.txt</outputfileOrbit>
+			<outputfileOrbit>{workspace}/output/ddk7_D_2020-07-02.txt</outputfileOrbit>
 			<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo1_satelliteModel.xml</inputfileSatelliteModel>
 			<timeSeries>
 				<uniformSampling>
@@ -60,7 +60,7 @@
 			<forces>
 				<gravityfield>
 					<potentialCoefficients>
-						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_unfiltered/GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
+						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_DDK7/kfilter_DDK7_GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
 						<minDegree>0</minDegree>
 						<maxDegree>200</maxDegree>
 						<factor>1.0</factor>
@@ -210,9 +210,9 @@
 			<reverse>0</reverse>
 		</SimulateOrbit>
 	</program>
-	<program comment="{workspace}/output/temp_D_2020-07-02.txt">
+	<program comment="{workspace}/output/ddk7_C_2020-07-02.txt">
 		<SimulateOrbit>
-			<outputfileOrbit>{workspace}/output/temp_D_2020-07-02.txt</outputfileOrbit>
+			<outputfileOrbit>{workspace}/output/ddk7_C_2020-07-02.txt</outputfileOrbit>
 			<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo2_satelliteModel.xml</inputfileSatelliteModel>
 			<timeSeries>
 				<uniformSampling>
@@ -257,7 +257,7 @@
 			<forces>
 				<gravityfield>
 					<potentialCoefficients>
-						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_unfiltered/GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
+						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_DDK7/kfilter_DDK7_GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
 						<minDegree>0</minDegree>
 						<maxDegree>200</maxDegree>
 						<factor>1.0</factor>
@@ -399,5 +399,87 @@
 			</forces>
 			<reverse>0</reverse>
 		</SimulateOrbit>
+	</program>
+	<program comment="/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/groundtrack_C_2020-07-02.txt" disabled="1">
+		<Orbit2Groundtracks>
+			<outputfileGriddedData>/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/groundtrack_C_2020-07-02.txt</outputfileGriddedData>
+			<inputfileOrbit>/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/temp_C_2020-07-02.txt</inputfileOrbit>
+			<earthRotation>
+				<file>
+					<inputfileEOP>{groopsDataDir}/earthRotation/timeSeries_EOP_rapid_IAU2000_desai.dat</inputfileEOP>
+					<interpolationDegree>3</interpolationDegree>
+				</file>
+			</earthRotation>
+			<R>6378137.0</R>
+			<inverseFlattening>298.2572221010</inverseFlattening>
+		</Orbit2Groundtracks>
+	</program>
+	<program comment="{workspace}/image/groundtrac_C_2020-07-02.png" disabled="1">
+		<PlotMap>
+			<outputfile>{workspace}/image/groundtrac_C_2020-07-02.png</outputfile>
+			<statisticInfos>0</statisticInfos>
+			<layer>
+				<blueMarble>
+					<inputfileChannels>{groopsDataDir}/plot/blue_marble/1800x900/bluemarble.05.grd</inputfileChannels>
+					<brightness>0.0</brightness>
+				</blueMarble>
+			</layer>
+			<layer>
+				<points>
+					<inputfileGriddedData>/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/groundtrack_C_2020-07-02.txt</inputfileGriddedData>
+					<value>data0</value>
+					<symbol>
+						<circle>
+							<color>
+								<red/>
+							</color>
+							<size>3</size>
+							<blackContour>0</blackContour>
+						</circle>
+					</symbol>
+					<drawLineAsGreatCircle>1</drawLineAsGreatCircle>
+				</points>
+			</layer>
+			<R>6378137.0</R>
+			<inverseFlattening>298.2572221010</inverseFlattening>
+			<minLambda>-180</minLambda>
+			<maxLambda>180</maxLambda>
+			<minPhi>-90</minPhi>
+			<maxPhi>90</maxPhi>
+			<majorTickSpacing>0</majorTickSpacing>
+			<minorTickSpacing>0</minorTickSpacing>
+			<gridLineSpacing>0</gridLineSpacing>
+			<colorbar>
+				<logarithmic>0</logarithmic>
+				<triangleLeft>1</triangleLeft>
+				<triangleRight>1</triangleRight>
+				<illuminate>0</illuminate>
+				<vertical>0</vertical>
+				<length>100</length>
+				<margin>0.4</margin>
+				<colorTable>haxby</colorTable>
+				<reverse>0</reverse>
+				<showColorbar>1</showColorbar>
+			</colorbar>
+			<projection>
+				<robinson>
+					<centralMeridian>0</centralMeridian>
+				</robinson>
+			</projection>
+			<options>
+				<width>12</width>
+				<titleFontSize>12</titleFontSize>
+				<marginTitle>0.4</marginTitle>
+				<drawGridOnTop>0</drawGridOnTop>
+				<options>FONT_ANNOT_PRIMARY=10p</options>
+				<options>MAP_ANNOT_OFFSET_PRIMARY=0.1c</options>
+				<options>FONT_LABEL=10p</options>
+				<options>MAP_LABEL_OFFSET=0.1c</options>
+				<options>FONT_ANNOT_SECONDARY=10p</options>
+				<transparent>1</transparent>
+				<dpi>300</dpi>
+				<removeFiles>1</removeFiles>
+			</options>
+		</PlotMap>
 	</program>
 </groops>

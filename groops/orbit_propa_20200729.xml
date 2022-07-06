@@ -14,9 +14,9 @@
 			<inputfile>{workspace}/input/2020-07-29/AOD1B_2020-07-29_X_06.asc</inputfile>
 		</GraceAod2TimeSplines>
 	</program>
-	<program comment="{workspace}/output/temp_C_2020-07-29.txt">
+	<program comment="{workspace}/output/ddk7_D_2020-07-29.txt">
 		<SimulateOrbit>
-			<outputfileOrbit>{workspace}/output/temp_C_2020-07-29.txt</outputfileOrbit>
+			<outputfileOrbit>{workspace}/output/ddk7_D_2020-07-29.txt</outputfileOrbit>
 			<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo1_satelliteModel.xml</inputfileSatelliteModel>
 			<timeSeries>
 				<uniformSampling>
@@ -60,7 +60,7 @@
 			<forces>
 				<gravityfield>
 					<potentialCoefficients>
-						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_unfiltered/GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
+						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_DDK7/kfilter_DDK7_GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
 						<minDegree>0</minDegree>
 						<maxDegree>200</maxDegree>
 						<factor>1.0</factor>
@@ -210,9 +210,9 @@
 			<reverse>0</reverse>
 		</SimulateOrbit>
 	</program>
-	<program comment="{workspace}/output/temp_D_2020-07-29.txt">
+	<program comment="{workspace}/output/ddk7_C_2020-07-29.txt">
 		<SimulateOrbit>
-			<outputfileOrbit>{workspace}/output/temp_D_2020-07-29.txt</outputfileOrbit>
+			<outputfileOrbit>{workspace}/output/ddk7_C_2020-07-29.txt</outputfileOrbit>
 			<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo2_satelliteModel.xml</inputfileSatelliteModel>
 			<timeSeries>
 				<uniformSampling>
@@ -257,7 +257,7 @@
 			<forces>
 				<gravityfield>
 					<potentialCoefficients>
-						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_unfiltered/GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
+						<inputfilePotentialCoefficients>{groopsDataDir}/potential/JPL_JPL-Release-06-GFO_96x96_DDK7/kfilter_DDK7_GSM-2_2020122-2020152_GRFO_JPLEM_BB01_0600.gfc</inputfilePotentialCoefficients>
 						<minDegree>0</minDegree>
 						<maxDegree>200</maxDegree>
 						<factor>1.0</factor>
