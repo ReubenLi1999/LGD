@@ -320,7 +320,7 @@ def ascending():
     freq_pod_x_rate, psd_pod_x_rate = welch(lri_x[:, 2] - range_rate_pod[:, 0], fs, ('kaiser', 30.), lri_x.__len__(), scaling='density')
 
     fig, ax = plt.subplots(figsize=(16, 8))
-    rr = lri_x[:, 2] - range_rate_pod[:, 0]
+    rr = lri_x[:, 2] - range_rate_pod[:, 0] + lri_x[:, 6]
     lgd = rr2lgd(rr, fs)
     plt.plot(lgd)
     plt.plot(lgd_out[:, 2])
@@ -456,7 +456,7 @@ def descending():
         range_rate_pod[index] = np.dot(vec_rela[index, :], los[index, :])
 
     fs = 0.5
-    rr = lri_x[:, 2] - range_rate_pod[:, 0]
+    rr = lri_x[:, 2] - range_rate_pod[:, 0]  + lri_x[:, 6]
     lgd = rr2lgd(rr, fs)
 
     fig, ax = plt.subplots(figsize=(16, 8))  # 2020-07-29
