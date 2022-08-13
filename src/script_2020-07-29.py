@@ -295,8 +295,8 @@ def ascending():
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
     plt.rcParams["axes.unicode_minus"] = False
     lri_x = np.loadtxt("../input/2020-07-29/LRI1B_2020-07-29_Y_04.txt", dtype=np.longdouble, skiprows=0)
-    pod_c = np.loadtxt("../output/ddk7_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
-    pod_d = np.loadtxt("../output/ddk7_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_c = np.loadtxt("../output/goco06_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_d = np.loadtxt("../output/goco06_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
     gnv_c = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     gnv_d = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     lgd_out = np.loadtxt("../input/2020-07-29/lgd20200729", dtype=np.longdouble)
@@ -344,7 +344,7 @@ def ascending():
     ax.set_title("2020-07-29", fontsize=24)
     ax.yaxis.get_offset_text().set_fontsize(24)
     ax.legend(fontsize=15, loc='best', frameon=False)
-    ax.set_ylabel(r'LGD [m/s$^2\sqrt{Hz}$]', fontsize=20)
+    ax.set_ylabel(r'LGD [m/s$^2$]', fontsize=20)
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
 
@@ -381,7 +381,7 @@ def ascending():
                 color='#9C27B0',
                 label="LRI")
     ax.tick_params(labelsize=25, width=2.9)
-    ax.set_xlabel('频率 [Hz]', fontsize=20)
+    ax.set_xlabel('Frequency [Hz]', fontsize=20)
     ax.set_xlim([1e-4, 5e-1])
     ax.yaxis.get_offset_text().set_fontsize(24)
     ax.set_ylabel(r'LGD [nm/s$^2 / \sqrt{Hz}$]', fontsize=20)
@@ -438,8 +438,8 @@ def descending():
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
     plt.rcParams["axes.unicode_minus"] = False
     lri_x = np.loadtxt("../input/2020-07-29/LRI1B_2020-07-29_Y_04.txt", dtype=np.longdouble, skiprows=0)
-    pod_c = np.loadtxt("../output/ddk7_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
-    pod_d = np.loadtxt("../output/ddk7_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_c = np.loadtxt("../output/goco06_C_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
+    pod_d = np.loadtxt("../output/goco06_D_2020-07-29.txt", dtype=np.longdouble, skiprows=6)
     gnv_c = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     gnv_d = np.loadtxt("../input/2020-07-29/GNV1B_2020-07-29_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     lgd_out = np.loadtxt("../input/2020-07-29/lgd20200729", dtype=np.longdouble)
@@ -470,7 +470,7 @@ def descending():
     ax.set_xlabel('Lat [deg]', fontsize=20)
     ax.yaxis.get_offset_text().set_fontsize(24)
     ax.legend(fontsize=15, loc='best', frameon=False)
-    ax.set_ylabel(r'LGD [m/s$^2\sqrt{Hz}$]', fontsize=20)
+    ax.set_ylabel(r'LGD [m/s$^2$]', fontsize=20)
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
     plt.tight_layout()
