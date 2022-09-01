@@ -184,7 +184,7 @@ def butter_highpass_filter(data, cutoff, fs, order=5):
     return y
 
 
-def rr2lgd(rr, fs):
+def rr2lgd(rr, fs, flag):
     ra = np.gradient(rr) * fs
     w = fftfreq(ra.size, d=1/fs)
     f_signal = rfft(ra)
@@ -193,7 +193,12 @@ def rr2lgd(rr, fs):
     lgd_filter[(w < 1e-3)] = 1
     filtered = f_signal * lgd_filter
     cut = irfft(filtered)
-    cut = butter_highpass_filter(cut, 2e-3, fs, 5)
+    # cut = butter_highpass_filter(cut, 2e-3, fs, 5)
+    if flag == "lri":
+        coeff = np.loadtxt("../input/bandpass_1mhz_10mhz_lri.fcf", dtype=np.float64, skiprows=14)
+    else:
+        coeff = np.loadtxt("../input/bandpass_1mhz_10mhz_kbr.fcf", dtype=np.float64, skiprows=14)
+    cut = filtfilt(coeff, 1, cut)
     return cut
 
 
@@ -285,6 +290,17 @@ def soil_moisture(lat_span, lon_span, flag):
     return np.asarray(res)
 
 
+def antialias_filter(interval, sig, flag):
+    if flag == 'lri':
+        coeff = np.loadtxt("../input/dealias_lri.fcf", skiprows=14)
+    else:
+        coeff = np.loadtxt("../input/dealias_kbr.fcf", skiprows=14)
+
+    cut = filtfilt(coeff, 1, sig)
+
+    return cut[::interval]
+
+
 def ascending():
 
     # the starting epoch of the short arc on 2020-07-02 is 14042 [2s sampling]
@@ -292,11 +308,18 @@ def ascending():
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
     plt.rcParams["axes.unicode_minus"] = False
     lri_x = np.loadtxt("../input/2020-07-02/LRI1B_2020-07-02_Y_04.txt", dtype=np.longdouble, skiprows=129)
-    pod_c = np.loadtxt("../output/temp_C_2020-07-02.txt", dtype=np.longdouble, skiprows=6)
-    pod_d = np.loadtxt("../output/temp_D_2020-07-02.txt", dtype=np.longdouble, skiprows=6)
+    kbr_x = np.loadtxt("E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\KBR1B_2020-07-02_Y_04.txt",
+                       dtype=np.float64,
+                       skiprows=162)
+    # pod_c = np.loadtxt("../output/temp_C_2020-07-02.txt", dtype=np.longdouble, skiprows=6)
+    # pod_d = np.loadtxt("../output/temp_D_2020-07-02.txt", dtype=np.longdouble, skiprows=6)
+    pod_c = np.loadtxt("E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_2020-07-02.txt", skiprows=6)
+    pod_d = np.loadtxt("E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_2020-07-02.txt", skiprows=6)
     gnv_c = np.loadtxt("../input/2020-07-02/GNV1B_2020-07-02_C_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     gnv_d = np.loadtxt("../input/2020-07-02/GNV1B_2020-07-02_D_04.txt", skiprows=148, usecols=[3, 4, 5])[::2]
     lgd_out = np.loadtxt("../input/2020-07-02/lgd20200702", dtype=np.longdouble)
+    sst_kbr = np.loadtxt("../output/grace-fo_satelliteTracking_2020-07-02_ggm05c_kbr.txt", skiprows=6)
+    sst = np.loadtxt("../output/grace-fo_satelliteTracking_2020-07-02_JPL.txt", skiprows=6)
     latlon = np.loadtxt("../input/2020-07-02/coor_2020-07-02_ascend.txt", dtype=np.longdouble)
 
     vec_rela = pod_c[:, 4: 7] - pod_d[:, 4: 7]
@@ -309,23 +332,31 @@ def ascending():
         los[index, :] = pos_rela[index, :] / dis[index]
         range_rate_pod[index] = np.dot(vec_rela[index, :], los[index, :])
 
+    sst_kbr[:, 2] = antialias_filter(5, sst[:, 2], "kbr")
+    range_rate_pod[:, 0] = antialias_filter(2, sst[:, 2], "lri")
+
     fs = 0.5
 
     fig, ax = plt.subplots(figsize=(16, 8))
-    rr = lri_x[:, 2] - range_rate_pod[:, 0]
-    lgd = rr2lgd(rr, fs)
-    plt.plot(lgd, label="self")
-    plt.plot(lgd_out[:, 2], label="released(open-access)")
+    rr_kbr = kbr_x[:, 2] + kbr_x[:, 6] + kbr_x[:, 9] - sst_kbr[:, 2]
+    rr = lri_x[:, 2] - range_rate_pod[:, 0] + lri_x[:, 6]
+    lgd = rr2lgd(rr, fs, "lri")
+    lgd_kbr = rr2lgd(rr_kbr, 0.2, "kbr")
+    plt.plot(np.linspace(0, 86400, lgd_kbr.__len__()), lgd_kbr, label="kbr")
+    plt.plot(np.linspace(0, 86400, lgd.__len__()), lgd, label="lri")
+    # plt.plot(np.linspace(0, 86400, lgd.__len__()), lgd_out[:, 2], label="released(open-access)")
+    ax.set_xlim([14042*2, 14042*2+1422*2])
+    ax.set_ylim([-1.25e-8, 1e-8])
     ax.tick_params(labelsize=25, width=2.9)
     ax.yaxis.get_offset_text().set_fontsize(24)
     ax.legend(fontsize=15, loc='best', frameon=False)
-    ax.set_ylabel(r'LGD [m/s$^2\sqrt{Hz}$]', fontsize=20)
+    ax.set_ylabel(r'LGD [m/s$^2$]', fontsize=20)
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
 
     fig, ax = plt.subplots(figsize=(16, 8))  # 2020-07-02
+    plt.plot(latlon[:, 0], lgd_out[14042: 14042+1422, 2], label="released(open-access)")
     plt.plot(latlon[:, 0], lgd[14042: 14042+1422], label="self")
-    plt.plot(latlon[:, 0], lgd_out[14042: 14042+1422, 0], label="released(open-access)")
     pod_c_arc = gnv_c[14042: 14042+1422]
     pod_d_arc = gnv_d[14042: 14042+1422]
     los_arc = los[14042: 14042+1422]
@@ -335,7 +366,7 @@ def ascending():
     ax.set_xlabel('Lat [deg]', fontsize=20)
     ax.yaxis.get_offset_text().set_fontsize(24)
     ax.legend(fontsize=15, loc='best', frameon=False)
-    ax.set_ylabel(r'LGD [m/s$^2\sqrt{Hz}$]', fontsize=20)
+    ax.set_ylabel(r'LGD [m/s$^2$]', fontsize=20)
     ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
     plt.setp(ax.spines.values(), linewidth=3)
 
@@ -347,14 +378,26 @@ def ascending():
 
     # ASD of LGD
     X, f, C = lpsd(lgd, windows.nuttall, 1e-4, 2e-1, 400, 100, 2, fs, 0.5)
+    X_self, f_self, C_self = lpsd(lgd_out[2000: -2000, 2], windows.nuttall, 1e-4, 2e-1, 400, 100, 2, fs, 0.5)
+    X_kbr, f_kbr, C_kbr = lpsd(lgd_kbr, windows.nuttall, 1e-4, 1e-1, 400, 100, 2, 0.2, 0.5)
     fig, ax = plt.subplots(figsize=(16, 8))
     ax.loglog(f,
                 np.sqrt(X*C['PSD']) * 1e9,
                 linewidth=4,
                 color='#9C27B0',
-                label="LRI")
+                label="self")
+    ax.loglog(f_self,
+                np.sqrt(X_self*C_self['PSD']) * 1e9,
+                linewidth=4,
+                color='blue',
+                label="han")
+    ax.loglog(f_kbr,
+                np.sqrt(X_kbr*C_kbr['PSD']) * 1e9,
+                linewidth=4,
+                color='red',
+                label="kbr")
     ax.tick_params(labelsize=25, width=2.9)
-    ax.set_xlabel('频率 [Hz]', fontsize=20)
+    ax.set_xlabel('Frequency [Hz]', fontsize=20)
     ax.set_xlim([1e-4, 5e-1])
     ax.yaxis.get_offset_text().set_fontsize(24)
     ax.set_ylabel(r'LGD [nm/s$^2 / \sqrt{Hz}$]', fontsize=20)
@@ -419,4 +462,4 @@ def descending():
 
 if __name__ == "__main__":
     ascending()
-    descending()
+    # descending()

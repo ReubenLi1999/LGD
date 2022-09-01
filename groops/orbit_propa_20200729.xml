@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <groops>
 	<global>
-		<filename label="groopsDataDir">/home/reuben/Desktop/D/Downloads/data</filename>
-		<string label="workspace">/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD</string>
+		<filename label="groopsDataDir">D:/Downloads/data</filename>
+		<string label="workspace">E:/lhsPrograms/Projects_2022/LGD</string>
+		<string label="date4int">2020-07-24</string>
+		<string label="dateBefore">2020-07-23</string>
+		<string label="dateAfter">2020-07-25</string>
+		<timeSeriesType label="timeSeries4int">
+			<uniformSampling>
+				<timeStart>59054</timeStart>
+				<timeEnd>59054+23/24+59/1440+58/86400</timeEnd>
+				<sampling>23.1481481481481e-006</sampling>
+			</uniformSampling>
+		</timeSeriesType>
 	</global>
-	<program comment="{workspace}/input/2020-07-29/de_2020-07-29.txt" disabled="1">
+	<program comment="{workspace}/input/{date4int}/de_{date4int}.txt">
 		<GraceAod2TimeSplines>
-			<outputfileDealiasing>{workspace}/input/2020-07-29/de_2020-07-29.txt</outputfileDealiasing>
-			<outputfileAtmosphere>{workspace}/input/2020-07-29/at_2020-07-29.txt</outputfileAtmosphere>
-			<outputfileOcean>{workspace}/input/2020-07-29/oc_2020-07-29.txt</outputfileOcean>
-			<outputfileBottomPressure>{workspace}/input/2020-07-29/bp_2020-07-29.txt</outputfileBottomPressure>
-			<outputfileMisc>{workspace}/input/2020-07-29/mi_2020-07-29.txt</outputfileMisc>
-			<inputfile>{workspace}/input/2020-07-29/AOD1B_2020-07-29_X_06.asc</inputfile>
+			<outputfileDealiasing>{workspace}/input/{date4int}/de_{date4int}.txt</outputfileDealiasing>
+			<inputfile>D:\Downloads\AOD1B_2020-07_06\AOD1B_{dateBefore}_X_06.asc</inputfile>
+			<inputfile>D:\Downloads\AOD1B_2020-07_06\AOD1B_{date4int}_X_06.asc</inputfile>
+			<inputfile>D:\Downloads\AOD1B_2020-07_06\AOD1B_{dateAfter}_X_06.asc</inputfile>
 		</GraceAod2TimeSplines>
 	</program>
-	<program comment="{workspace}/output/ggm05c_D_2020-07-29.txt">
+	<program comment="{workspace}/output/ggm05c_D_{date4int}_woacc.txt">
 		<SimulateOrbit>
-			<outputfileOrbit>{workspace}/output/ggm05c_D_2020-07-29.txt</outputfileOrbit>
+			<outputfileOrbit>{workspace}/output/ggm05c_D_{date4int}_woacc.txt</outputfileOrbit>
 			<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo1_satelliteModel.xml</inputfileSatelliteModel>
-			<timeSeries>
-				<uniformSampling>
-					<timeStart>59059</timeStart>
-					<timeEnd>59059+23/24+59/1440+58/86400</timeEnd>
-					<sampling>23.1481481481481e-006</sampling>
-				</uniformSampling>
-			</timeSeries>
+			<timeSeries link="timeSeries4int"/>
 			<integrationConstants>
 				<positionAndVelocity>
 					<position0x>-4598303.389636748</position0x>
@@ -62,32 +64,33 @@
 					<potentialCoefficients>
 						<inputfilePotentialCoefficients>{groopsDataDir}/potential/GGM05C.gfc</inputfilePotentialCoefficients>
 						<minDegree>0</minDegree>
+						<maxDegree>200</maxDegree>
 						<factor>1.0</factor>
 						<setSigmasToZero>0</setSigmasToZero>
 					</potentialCoefficients>
 				</gravityfield>
 				<gravityfield>
 					<timeSplines>
-						<inputfileTimeSplinesGravityfield>{workspace}/input/2020-07-29/de_2020-07-29.txt</inputfileTimeSplinesGravityfield>
+						<inputfileTimeSplinesGravityfield>{workspace}/input/{date4int}/de_{date4int}.txt</inputfileTimeSplinesGravityfield>
 						<minDegree>0</minDegree>
 						<factor>1.0</factor>
 					</timeSplines>
 				</gravityfield>
-				<gravityfield>
+				<gravityfield disabled="1">
 					<timeSplines>
 						<inputfileTimeSplinesGravityfield>{workspace}/input/2020-07-29/at_2020-07-29.txt</inputfileTimeSplinesGravityfield>
 						<minDegree>0</minDegree>
 						<factor>1.0</factor>
 					</timeSplines>
 				</gravityfield>
-				<gravityfield>
+				<gravityfield disabled="1">
 					<timeSplines>
 						<inputfileTimeSplinesGravityfield>{workspace}/input/2020-07-29/oc_2020-07-29.txt</inputfileTimeSplinesGravityfield>
 						<minDegree>0</minDegree>
 						<factor>1.0</factor>
 					</timeSplines>
 				</gravityfield>
-				<gravityfield>
+				<gravityfield disabled="1">
 					<timeSplines>
 						<inputfileTimeSplinesGravityfield>{workspace}/input/2020-07-29/bp_2020-07-29.txt</inputfileTimeSplinesGravityfield>
 						<minDegree>0</minDegree>
@@ -116,7 +119,6 @@
 						<inputfileTides>{groopsDataDir}/tides/oceanTide_fes2014b_n180_version20170520.dat</inputfileTides>
 						<inputfileAdmittance>{groopsDataDir}/tides/oceanTide_fes2014b_admittance_linear_linear.txt</inputfileAdmittance>
 						<minDegree>2</minDegree>
-						<maxDegree>180</maxDegree>
 						<nodeCorr>0</nodeCorr>
 						<factor>1.0</factor>
 					</doodsonHarmonicTide>
@@ -149,13 +151,6 @@
 					</solidMoonTide>
 				</tides>
 				<tides>
-					<earthTide>
-						<inputfileEarthtide>{groopsDataDir}/tides/earthAnelastic2003.xml</inputfileEarthtide>
-						<includePermanentTide>0</includePermanentTide>
-						<factor>1.0</factor>
-					</earthTide>
-				</tides>
-				<tides>
 					<doodsonHarmonicTide>
 						<inputfileTides>{groopsDataDir}/tides/atmosphericTide_AOD1BRL06.dat</inputfileTides>
 						<minDegree>2</minDegree>
@@ -172,7 +167,7 @@
 						<factor>1.0</factor>
 					</relativisticEffect>
 				</miscAccelerations>
-				<miscAccelerations>
+				<miscAccelerations disabled="1">
 					<solarRadiationPressure>
 						<solarflux>1367</solarflux>
 						<eclipse>
@@ -181,7 +176,7 @@
 						<factor>1.0</factor>
 					</solarRadiationPressure>
 				</miscAccelerations>
-				<miscAccelerations>
+				<miscAccelerations disabled="1">
 					<albedo>
 						<inputfileReflectivity>{groopsDataDir}/albedo/earth_ceres_reflectivity_grid2.5.dat</inputfileReflectivity>
 						<inputfileEmissivity>{groopsDataDir}/albedo/earth_ceres_emissivity_grid2.5.dat</inputfileEmissivity>
@@ -189,7 +184,7 @@
 						<factor>1.0</factor>
 					</albedo>
 				</miscAccelerations>
-				<miscAccelerations>
+				<miscAccelerations disabled="1">
 					<atmosphericDrag>
 						<thermosphere>
 							<jb2008>
@@ -209,9 +204,9 @@
 			<reverse>0</reverse>
 		</SimulateOrbit>
 	</program>
-	<program comment="{workspace}/output/ggm05c_C_2020-07-29.txt">
+	<program comment="{workspace}/output/ggm05c_C_2020-07-29_woacc.txt" disabled="1">
 		<SimulateOrbit>
-			<outputfileOrbit>{workspace}/output/ggm05c_C_2020-07-29.txt</outputfileOrbit>
+			<outputfileOrbit>{workspace}/output/ggm05c_C_2020-07-29_woacc.txt</outputfileOrbit>
 			<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo2_satelliteModel.xml</inputfileSatelliteModel>
 			<timeSeries>
 				<uniformSampling>
@@ -258,6 +253,7 @@
 					<potentialCoefficients>
 						<inputfilePotentialCoefficients>{groopsDataDir}/potential/GGM05C.gfc</inputfilePotentialCoefficients>
 						<minDegree>0</minDegree>
+						<maxDegree>200</maxDegree>
 						<factor>1.0</factor>
 						<setSigmasToZero>0</setSigmasToZero>
 					</potentialCoefficients>
@@ -269,21 +265,21 @@
 						<factor>1.0</factor>
 					</timeSplines>
 				</gravityfield>
-				<gravityfield>
+				<gravityfield disabled="1">
 					<timeSplines>
 						<inputfileTimeSplinesGravityfield>{workspace}/input/2020-07-29/at_2020-07-29.txt</inputfileTimeSplinesGravityfield>
 						<minDegree>0</minDegree>
 						<factor>1.0</factor>
 					</timeSplines>
 				</gravityfield>
-				<gravityfield>
+				<gravityfield disabled="1">
 					<timeSplines>
 						<inputfileTimeSplinesGravityfield>{workspace}/input/2020-07-29/oc_2020-07-29.txt</inputfileTimeSplinesGravityfield>
 						<minDegree>0</minDegree>
 						<factor>1.0</factor>
 					</timeSplines>
 				</gravityfield>
-				<gravityfield>
+				<gravityfield disabled="1">
 					<timeSplines>
 						<inputfileTimeSplinesGravityfield>{workspace}/input/2020-07-29/bp_2020-07-29.txt</inputfileTimeSplinesGravityfield>
 						<minDegree>0</minDegree>
@@ -312,7 +308,6 @@
 						<inputfileTides>{groopsDataDir}/tides/oceanTide_fes2014b_n180_version20170520.dat</inputfileTides>
 						<inputfileAdmittance>{groopsDataDir}/tides/oceanTide_fes2014b_admittance_linear_linear.txt</inputfileAdmittance>
 						<minDegree>2</minDegree>
-						<maxDegree>180</maxDegree>
 						<nodeCorr>0</nodeCorr>
 						<factor>1.0</factor>
 					</doodsonHarmonicTide>
@@ -361,7 +356,7 @@
 						<factor>1.0</factor>
 					</relativisticEffect>
 				</miscAccelerations>
-				<miscAccelerations>
+				<miscAccelerations disabled="1">
 					<solarRadiationPressure>
 						<solarflux>1367</solarflux>
 						<eclipse>
@@ -370,7 +365,7 @@
 						<factor>1.0</factor>
 					</solarRadiationPressure>
 				</miscAccelerations>
-				<miscAccelerations>
+				<miscAccelerations disabled="1">
 					<albedo>
 						<inputfileReflectivity>{groopsDataDir}/albedo/earth_ceres_reflectivity_grid2.5.dat</inputfileReflectivity>
 						<inputfileEmissivity>{groopsDataDir}/albedo/earth_ceres_emissivity_grid2.5.dat</inputfileEmissivity>
@@ -378,7 +373,7 @@
 						<factor>1.0</factor>
 					</albedo>
 				</miscAccelerations>
-				<miscAccelerations>
+				<miscAccelerations disabled="1">
 					<atmosphericDrag>
 						<thermosphere>
 							<jb2008>
@@ -397,5 +392,701 @@
 			</forces>
 			<reverse>0</reverse>
 		</SimulateOrbit>
+	</program>
+	<program comment="GRACE-C" disabled="1">
+		<GroupPrograms>
+			<silently>0</silently>
+			<program comment="GRACE-C">
+				<GraceL1b2Accelerometer>
+					<outputfileAccelerometer>{workspace}/input/2020-07-29/gracefo-c_ACT1B_2020-07-29.txt</outputfileAccelerometer>
+					<inputfile>D:\Downloads\gracefo_1B_2020-07-29_RL04.ascii.noLRI\ACT1B_2020-07-29_C_04.txt</inputfile>
+				</GraceL1b2Accelerometer>
+			</program>
+			<program comment="{workspace}/input/2020-07-29/gracefo-c_GNV1B_2020-07-29.txt">
+				<GraceL1b2Orbit>
+					<outputfileOrbit>{workspace}/input/2020-07-29/gracefo-c_GNV1B_2020-07-29.txt</outputfileOrbit>
+					<earthRotation>
+						<file>
+							<inputfileEOP>{groopsDataDir}/earthRotation/timeSeries_EOP_rapid_IAU2000_desai.dat</inputfileEOP>
+							<interpolationDegree>3</interpolationDegree>
+						</file>
+					</earthRotation>
+					<inputfile>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\GNV1B_2020-07-29_C_04.txt</inputfile>
+				</GraceL1b2Orbit>
+			</program>
+			<program comment="{workspace}/input/2020-07-29/gracefo-c_SCA1B_2020-07-29.txt">
+				<GraceL1b2StarCamera>
+					<outputfileStarCamera>{workspace}/input/2020-07-29/gracefo-c_SCA1B_2020-07-29.txt</outputfileStarCamera>
+					<inputfile>E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-29_RL04.ascii.noLRI\SCA1B_2020-07-29_C_04.txt</inputfile>
+				</GraceL1b2StarCamera>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt">
+				<InstrumentReduceSampling>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt</inputfileInstrument>
+					<sampling>2</sampling>
+					<margin>1e-5</margin>
+					<relative2FirstEpoch>0</relative2FirstEpoch>
+				</InstrumentReduceSampling>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_GNV1B_2020-07-29.txt">
+				<InstrumentReduceSampling>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_GNV1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_GNV1B_2020-07-29.txt</inputfileInstrument>
+					<sampling>2</sampling>
+					<margin>1e-5</margin>
+					<relative2FirstEpoch>0</relative2FirstEpoch>
+				</InstrumentReduceSampling>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_SCA1B_2020-07-29.txt">
+				<InstrumentReduceSampling>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_SCA1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_SCA1B_2020-07-29.txt</inputfileInstrument>
+					<sampling>2</sampling>
+					<margin>1e-5</margin>
+					<relative2FirstEpoch>0</relative2FirstEpoch>
+				</InstrumentReduceSampling>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt">
+				<InstrumentRemoveEpochsByCriteria>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt</inputfileInstrument>
+					<removalCriteria>abs(data0-data0median) &gt; 1E-5</removalCriteria>
+					<removalCriteria>abs(data1-data1median) &gt; 1E-5</removalCriteria>
+					<removalCriteria>abs(data2-data2median) &gt; 1E-5</removalCriteria>
+					<margin>1e-5</margin>
+				</InstrumentRemoveEpochsByCriteria>
+			</program>
+			<program>
+				<InstrumentSynchronize>
+					<data>
+						<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt</outputfileInstrument>
+						<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt</inputfileInstrument>
+					</data>
+					<data>
+						<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_GNV1B_2020-07-29.txt</outputfileInstrument>
+						<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_GNV1B_2020-07-29.txt</inputfileInstrument>
+					</data>
+					<data>
+						<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_SCA1B_2020-07-29.txt</outputfileInstrument>
+						<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_SCA1B_2020-07-29.txt</inputfileInstrument>
+					</data>
+					<margin>1e-5</margin>
+					<minArcLength>1</minArcLength>
+				</InstrumentSynchronize>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29_SIMU.txt">
+				<SimulateAccelerometer>
+					<outputfileAccelerometer>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29_SIMU.txt</outputfileAccelerometer>
+					<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo1_satelliteModel.xml</inputfileSatelliteModel>
+					<inputfileOrbit>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_GNV1B_2020-07-29.txt</inputfileOrbit>
+					<inputfileStarCamera>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_SCA1B_2020-07-29.txt</inputfileStarCamera>
+					<earthRotation>
+						<file>
+							<inputfileEOP>{groopsDataDir}/earthRotation/timeSeries_EOP_rapid_IAU2000_desai.dat</inputfileEOP>
+							<interpolationDegree>3</interpolationDegree>
+						</file>
+					</earthRotation>
+					<ephemerides>
+						<jpl>
+							<inputfileEphemerides>{groopsDataDir}/tides/ephemerides_JPL_DE432.dat</inputfileEphemerides>
+							<origin>
+								<earth/>
+							</origin>
+						</jpl>
+					</ephemerides>
+					<forces>
+						<miscAccelerations>
+							<solarRadiationPressure>
+								<solarflux>1367</solarflux>
+								<eclipse>
+									<conical/>
+								</eclipse>
+								<factor>1.0</factor>
+							</solarRadiationPressure>
+						</miscAccelerations>
+						<miscAccelerations>
+							<albedo>
+								<inputfileReflectivity>{groopsDataDir}/albedo/earth_ceres_reflectivity_grid2.5.dat</inputfileReflectivity>
+								<inputfileEmissivity>{groopsDataDir}/albedo/earth_ceres_emissivity_grid2.5.dat</inputfileEmissivity>
+								<solarflux>1367</solarflux>
+								<factor>1.0</factor>
+							</albedo>
+						</miscAccelerations>
+						<miscAccelerations>
+							<atmosphericDrag>
+								<thermosphere>
+									<nrlmsis2>
+										<inputfileMsis>{groopsDataDir}/thermosphere/nrlmsis2/inputMSIS.txt</inputfileMsis>
+										<inputfileModelParameters>{groopsDataDir}/thermosphere/nrlmsis2/msis20.parm</inputfileModelParameters>
+										<inputfileMagnetic3hAp>{groopsDataDir}/thermosphere/hwm14/apActivity.txt</inputfileMagnetic3hAp>
+										<hwm14DataDirectory>{groopsDataDir}/thermosphere/hwm14</hwm14DataDirectory>
+									</nrlmsis2>
+								</thermosphere>
+								<earthRotation>7.29211585531e-5</earthRotation>
+								<considerTemperature>0</considerTemperature>
+								<considerWind>0</considerWind>
+								<factor>1.0</factor>
+							</atmosphericDrag>
+						</miscAccelerations>
+					</forces>
+				</SimulateAccelerometer>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29.txt">
+				<InstrumentAccelerometerEstimateBiasScale>
+					<outputfileAccelerometer>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29.txt</outputfileAccelerometer>
+					<inputfileAccelerometer>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACT1B_2020-07-29.txt</inputfileAccelerometer>
+					<inputfileAccelerometerSim>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29_SIMU.txt</inputfileAccelerometerSim>
+					<marginThruster>1e-5</marginThruster>
+					<ephemerides>
+						<jpl>
+							<inputfileEphemerides>{groopsDataDir}/tides/ephemerides_JPL_DE432.dat</inputfileEphemerides>
+							<origin>
+								<earth/>
+							</origin>
+						</jpl>
+					</ephemerides>
+					<inputfileSatelliteModel>D:\Downloads\data\satelliteModel\gracefo1_satelliteModel.xml</inputfileSatelliteModel>
+					<parametrizationAcceleration>
+						<accBias>
+							<estimateX>1</estimateX>
+							<estimateY>1</estimateY>
+							<estimateZ>1</estimateZ>
+							<temporal>
+								<constant>
+									<includeLastTime>0</includeLastTime>
+								</constant>
+							</temporal>
+							<perArc>0</perArc>
+						</accBias>
+					</parametrizationAcceleration>
+				</InstrumentAccelerometerEstimateBiasScale>
+			</program>
+			<program comment="{workspace}/image/ACC_comparison_2020-07-29_C.png">
+				<PlotGraph>
+					<outputfile>{workspace}/image/ACC_comparison_2020-07-29_C.png</outputfile>
+					<title>GRACE-C ACC [2020-07-29]</title>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29_SIMU.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data1*1e9</valueY>
+							<description>X_simulated</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<black/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29_SIMU.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data2*1e9+400</valueY>
+							<description>Y_simulated+400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<black/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29_SIMU.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data3*1e9-400</valueY>
+							<description>Z_simulated-400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<black/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data1*1e9</valueY>
+							<description>X_calibrated</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<red/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data2*1e9+400</valueY>
+							<description>Y_calibrated+400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<green/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-c_ACC1B_2020-07-29.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data3*1e9-400</valueY>
+							<description>Z_calibrated-400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<blue/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<axisX>
+						<standard>
+							<gridLine>
+								<solid>
+									<width>0.25</width>
+									<color>
+										<gray/>
+									</color>
+								</solid>
+							</gridLine>
+							<label>Time [day]</label>
+							<logarithmic>0</logarithmic>
+							<color>
+								<black/>
+							</color>
+							<changeDirection>0</changeDirection>
+						</standard>
+					</axisX>
+					<axisY>
+						<standard>
+							<min>-450</min>
+							<max>450</max>
+							<gridLine>
+								<solid>
+									<width>0.25</width>
+									<color>
+										<gray/>
+									</color>
+								</solid>
+							</gridLine>
+							<label>Acceleration [nm/s^2]</label>
+							<logarithmic>0</logarithmic>
+							<color>
+								<black/>
+							</color>
+							<changeDirection>0</changeDirection>
+						</standard>
+					</axisY>
+					<legend>
+						<width>10</width>
+						<positionX>1.05</positionX>
+						<positionY>1.0</positionY>
+						<anchorPoint>TL</anchorPoint>
+						<columns>1</columns>
+					</legend>
+					<options>
+						<width>12</width>
+						<height>7</height>
+						<titleFontSize>12</titleFontSize>
+						<marginTitle>0.4</marginTitle>
+						<drawGridOnTop>0</drawGridOnTop>
+						<options>FONT_ANNOT_PRIMARY=10p</options>
+						<options>MAP_ANNOT_OFFSET_PRIMARY=0.1c</options>
+						<options>FONT_LABEL=10p</options>
+						<options>MAP_LABEL_OFFSET=0.1c</options>
+						<options>FONT_ANNOT_SECONDARY=10p</options>
+						<options>TIME_SYSTEM=MJD</options>
+						<transparent>1</transparent>
+						<dpi>600</dpi>
+						<removeFiles>1</removeFiles>
+					</options>
+				</PlotGraph>
+			</program>
+			<program comment="{workspace}/input/2020-07-29/gracefo-c_ACC1B_2020-07-29.txt" disabled="1">
+				<InstrumentRotate>
+					<outputfileInstrument>{workspace}/input/2020-07-29/gracefo-c_ACC1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>{workspace}/input/2020-07-29/gracefo-c_ACC1B_2020-07-29.txt</inputfileInstrument>
+					<inputfileStarCamera>{workspace}/input/2020-07-29/gracefo-c_SCA1B_2020-07-29.txt</inputfileStarCamera>
+					<inverseRotate>1</inverseRotate>
+				</InstrumentRotate>
+			</program>
+		</GroupPrograms>
+	</program>
+	<program comment="GRACE-D" disabled="1">
+		<GroupPrograms>
+			<silently>0</silently>
+			<program comment="GRACE-C">
+				<GraceL1b2Accelerometer>
+					<outputfileAccelerometer>{workspace}/input/2020-07-29/gracefo-d_ACT1B_2020-07-29.txt</outputfileAccelerometer>
+					<inputfile>D:\Downloads\gracefo_1B_2020-07-29_RL04.ascii.noLRI\ACT1B_2020-07-29_D_04.txt</inputfile>
+				</GraceL1b2Accelerometer>
+			</program>
+			<program comment="{workspace}/input/2020-07-29/gracefo-d_GNV1B_2020-07-29.txt">
+				<GraceL1b2Orbit>
+					<outputfileOrbit>{workspace}/input/2020-07-29/gracefo-d_GNV1B_2020-07-29.txt</outputfileOrbit>
+					<earthRotation>
+						<file>
+							<inputfileEOP>{groopsDataDir}/earthRotation/timeSeries_EOP_rapid_IAU2000_desai.dat</inputfileEOP>
+							<interpolationDegree>3</interpolationDegree>
+						</file>
+					</earthRotation>
+					<inputfile>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\GNV1B_2020-07-29_D_04.txt</inputfile>
+				</GraceL1b2Orbit>
+			</program>
+			<program comment="{workspace}/input/2020-07-29/gracefo-d_SCA1B_2020-07-29.txt">
+				<GraceL1b2StarCamera>
+					<outputfileStarCamera>{workspace}/input/2020-07-29/gracefo-d_SCA1B_2020-07-29.txt</outputfileStarCamera>
+					<inputfile>E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-29_RL04.ascii.noLRI\SCA1B_2020-07-29_D_04.txt</inputfile>
+				</GraceL1b2StarCamera>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt">
+				<InstrumentReduceSampling>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt</inputfileInstrument>
+					<sampling>2</sampling>
+					<margin>1e-5</margin>
+					<relative2FirstEpoch>0</relative2FirstEpoch>
+				</InstrumentReduceSampling>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_GNV1B_2020-07-29.txt">
+				<InstrumentReduceSampling>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_GNV1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_GNV1B_2020-07-29.txt</inputfileInstrument>
+					<sampling>2</sampling>
+					<margin>1e-5</margin>
+					<relative2FirstEpoch>0</relative2FirstEpoch>
+				</InstrumentReduceSampling>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_SCA1B_2020-07-29.txt">
+				<InstrumentReduceSampling>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_SCA1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_SCA1B_2020-07-29.txt</inputfileInstrument>
+					<sampling>2</sampling>
+					<margin>1e-5</margin>
+					<relative2FirstEpoch>0</relative2FirstEpoch>
+				</InstrumentReduceSampling>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt">
+				<InstrumentRemoveEpochsByCriteria>
+					<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt</inputfileInstrument>
+					<removalCriteria>abs(data0-data0median) &gt; 1E-5</removalCriteria>
+					<removalCriteria>abs(data1-data1median) &gt; 1E-5</removalCriteria>
+					<removalCriteria>abs(data2-data2median) &gt; 1E-5</removalCriteria>
+					<margin>1e-5</margin>
+				</InstrumentRemoveEpochsByCriteria>
+			</program>
+			<program>
+				<InstrumentSynchronize>
+					<data>
+						<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt</outputfileInstrument>
+						<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt</inputfileInstrument>
+					</data>
+					<data>
+						<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_GNV1B_2020-07-29.txt</outputfileInstrument>
+						<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_GNV1B_2020-07-29.txt</inputfileInstrument>
+					</data>
+					<data>
+						<outputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_SCA1B_2020-07-29.txt</outputfileInstrument>
+						<inputfileInstrument>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_SCA1B_2020-07-29.txt</inputfileInstrument>
+					</data>
+					<margin>1e-5</margin>
+					<minArcLength>1</minArcLength>
+				</InstrumentSynchronize>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29_SIMU.txt">
+				<SimulateAccelerometer>
+					<outputfileAccelerometer>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29_SIMU.txt</outputfileAccelerometer>
+					<inputfileSatelliteModel>{groopsDataDir}/satelliteModel/gracefo2_satelliteModel.xml</inputfileSatelliteModel>
+					<inputfileOrbit>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_GNV1B_2020-07-29.txt</inputfileOrbit>
+					<inputfileStarCamera>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_SCA1B_2020-07-29.txt</inputfileStarCamera>
+					<earthRotation>
+						<file>
+							<inputfileEOP>{groopsDataDir}/earthRotation/timeSeries_EOP_rapid_IAU2000_desai.dat</inputfileEOP>
+							<interpolationDegree>3</interpolationDegree>
+						</file>
+					</earthRotation>
+					<ephemerides>
+						<jpl>
+							<inputfileEphemerides>{groopsDataDir}/tides/ephemerides_JPL_DE432.dat</inputfileEphemerides>
+							<origin>
+								<earth/>
+							</origin>
+						</jpl>
+					</ephemerides>
+					<forces>
+						<miscAccelerations>
+							<solarRadiationPressure>
+								<solarflux>1367</solarflux>
+								<eclipse>
+									<conical/>
+								</eclipse>
+								<factor>1.0</factor>
+							</solarRadiationPressure>
+						</miscAccelerations>
+						<miscAccelerations>
+							<albedo>
+								<inputfileReflectivity>{groopsDataDir}/albedo/earth_ceres_reflectivity_grid2.5.dat</inputfileReflectivity>
+								<inputfileEmissivity>{groopsDataDir}/albedo/earth_ceres_emissivity_grid2.5.dat</inputfileEmissivity>
+								<solarflux>1367</solarflux>
+								<factor>1.0</factor>
+							</albedo>
+						</miscAccelerations>
+						<miscAccelerations>
+							<atmosphericDrag>
+								<thermosphere>
+									<nrlmsis2>
+										<inputfileMsis>{groopsDataDir}/thermosphere/nrlmsis2/inputMSIS.txt</inputfileMsis>
+										<inputfileModelParameters>{groopsDataDir}/thermosphere/nrlmsis2/msis20.parm</inputfileModelParameters>
+										<inputfileMagnetic3hAp>{groopsDataDir}/thermosphere/hwm14/apActivity.txt</inputfileMagnetic3hAp>
+										<hwm14DataDirectory>{groopsDataDir}/thermosphere/hwm14</hwm14DataDirectory>
+									</nrlmsis2>
+								</thermosphere>
+								<earthRotation>7.29211585531e-5</earthRotation>
+								<considerTemperature>0</considerTemperature>
+								<considerWind>0</considerWind>
+								<factor>1.0</factor>
+							</atmosphericDrag>
+						</miscAccelerations>
+					</forces>
+				</SimulateAccelerometer>
+			</program>
+			<program comment="E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29.txt">
+				<InstrumentAccelerometerEstimateBiasScale>
+					<outputfileAccelerometer>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29.txt</outputfileAccelerometer>
+					<inputfileAccelerometer>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACT1B_2020-07-29.txt</inputfileAccelerometer>
+					<inputfileAccelerometerSim>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29_SIMU.txt</inputfileAccelerometerSim>
+					<marginThruster>1e-5</marginThruster>
+					<ephemerides>
+						<jpl>
+							<inputfileEphemerides>{groopsDataDir}/tides/ephemerides_JPL_DE432.dat</inputfileEphemerides>
+							<origin>
+								<earth/>
+							</origin>
+						</jpl>
+					</ephemerides>
+					<inputfileSatelliteModel>D:\Downloads\data\satelliteModel\gracefo1_satelliteModel.xml</inputfileSatelliteModel>
+					<parametrizationAcceleration>
+						<accBias>
+							<estimateX>1</estimateX>
+							<estimateY>1</estimateY>
+							<estimateZ>1</estimateZ>
+							<temporal>
+								<constant>
+									<includeLastTime>0</includeLastTime>
+								</constant>
+							</temporal>
+							<perArc>0</perArc>
+						</accBias>
+					</parametrizationAcceleration>
+				</InstrumentAccelerometerEstimateBiasScale>
+			</program>
+			<program comment="{workspace}/image/ACC_comparison_2020-07-29_D.png">
+				<PlotGraph>
+					<outputfile>{workspace}/image/ACC_comparison_2020-07-29_D.png</outputfile>
+					<title>GRACE-D ACC [2020-07-29]</title>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29_SIMU.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data1*1e9</valueY>
+							<description>X_simulated</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<black/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29_SIMU.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data2*1e9+400</valueY>
+							<description>Y_simulated+400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<black/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29_SIMU.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data3*1e9-400</valueY>
+							<description>Z_simulated-400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<black/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data1*1e9</valueY>
+							<description>X_calibrated</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<red/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data2*1e9+400</valueY>
+							<description>Y_calibrated+400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<green/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<layer>
+						<linesAndPoints>
+							<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\2020-07-29\gracefo-d_ACC1B_2020-07-29.txt</inputfileMatrix>
+							<valueX>data0</valueX>
+							<valueY>data3*1e9-400</valueY>
+							<description>Z_calibrated-400</description>
+							<line>
+								<solid>
+									<width>1.5</width>
+									<color>
+										<blue/>
+									</color>
+								</solid>
+							</line>
+							<plotOnSecondAxis>0</plotOnSecondAxis>
+						</linesAndPoints>
+					</layer>
+					<axisX>
+						<standard>
+							<gridLine>
+								<solid>
+									<width>0.25</width>
+									<color>
+										<gray/>
+									</color>
+								</solid>
+							</gridLine>
+							<label>Time [day]</label>
+							<logarithmic>0</logarithmic>
+							<color>
+								<black/>
+							</color>
+							<changeDirection>0</changeDirection>
+						</standard>
+					</axisX>
+					<axisY>
+						<standard>
+							<min>-450</min>
+							<max>450</max>
+							<gridLine>
+								<solid>
+									<width>0.25</width>
+									<color>
+										<gray/>
+									</color>
+								</solid>
+							</gridLine>
+							<label>Acceleration [nm/s^2]</label>
+							<logarithmic>0</logarithmic>
+							<color>
+								<black/>
+							</color>
+							<changeDirection>0</changeDirection>
+						</standard>
+					</axisY>
+					<legend>
+						<width>10</width>
+						<positionX>1.05</positionX>
+						<positionY>1.0</positionY>
+						<anchorPoint>TL</anchorPoint>
+						<columns>1</columns>
+					</legend>
+					<options>
+						<width>12</width>
+						<height>7</height>
+						<titleFontSize>12</titleFontSize>
+						<marginTitle>0.4</marginTitle>
+						<drawGridOnTop>0</drawGridOnTop>
+						<options>FONT_ANNOT_PRIMARY=10p</options>
+						<options>MAP_ANNOT_OFFSET_PRIMARY=0.1c</options>
+						<options>FONT_LABEL=10p</options>
+						<options>MAP_LABEL_OFFSET=0.1c</options>
+						<options>FONT_ANNOT_SECONDARY=10p</options>
+						<options>TIME_SYSTEM=MJD</options>
+						<transparent>1</transparent>
+						<dpi>900</dpi>
+						<removeFiles>1</removeFiles>
+					</options>
+				</PlotGraph>
+			</program>
+			<program comment="{workspace}/input/2020-07-29/gracefo-d_ACC1B_2020-07-29.txt" disabled="1">
+				<InstrumentRotate>
+					<outputfileInstrument>{workspace}/input/2020-07-29/gracefo-d_ACC1B_2020-07-29.txt</outputfileInstrument>
+					<inputfileInstrument>{workspace}/input/2020-07-29/gracefo-d_ACC1B_2020-07-29.txt</inputfileInstrument>
+					<inputfileStarCamera>{workspace}/input/2020-07-29/gracefo-d_SCA1B_2020-07-29.txt</inputfileStarCamera>
+					<inverseRotate>1</inverseRotate>
+				</InstrumentRotate>
+			</program>
+		</GroupPrograms>
 	</program>
 </groops>

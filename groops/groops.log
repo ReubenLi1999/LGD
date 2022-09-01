@@ -1,4 +1,23 @@
-2022-08-13 14:58:55 Status  === Starting GROOPS with 4 processes ===
-2022-08-13 14:58:55 Info    Config file: <orbit_propa_20200729.xml>
-2022-08-13 14:58:56 Status  --- SimulateOrbit (/home/reuben/Desktop/E/lhsPrograms/Projects_2022/LGD/output/ggm05c_D_2020-07-29.txt) ---
-2022-08-13 14:58:59 Status  integrating orbit
+2022-08-22 10:18:09 Status  === Starting GROOPS ===
+2022-08-22 10:18:09 Info    Config file: <orbit_propa_20200729.xml>
+2022-08-22 10:18:09 Status  --- GroupPrograms (GRACE-C) ---
+2022-08-22 10:18:09 Status  --- InstrumentRotate (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-29/gracefo-c_ACC1B_2020-07-29.txt) ---
+2022-08-22 10:18:09 Status  read and rotate data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-29/gracefo-c_ACC1B_2020-07-29.txt>
+2022-08-22 10:18:10 Status  1 loops in time 00:00:01
+2022-08-22 10:18:10 Status  write data to file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-29/gracefo-c_ACC1B_2020-07-29.txt>
+2022-08-22 10:18:12 Info      time start:      2020-07-29_00-00-00
+2022-08-22 10:18:12 Info      time end:        2020-07-29_23-59-58
+2022-08-22 10:18:12 Info      epochs:          43200
+2022-08-22 10:18:12 Info      median sampling: 2 seconds
+2022-08-22 10:18:12 Info      gaps:            0
+2022-08-22 10:18:12 Status  --- GroupPrograms (GRACE-D) ---
+2022-08-22 10:18:12 Status  --- InstrumentRotate (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-29/gracefo-d_ACC1B_2020-07-29.txt) ---
+2022-08-22 10:18:12 Status  read and rotate data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-29/gracefo-d_ACC1B_2020-07-29.txt>
+2022-08-22 10:18:14 Status  1 loops in time 00:00:02
+2022-08-22 10:18:14 Status  write data to file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-29/gracefo-d_ACC1B_2020-07-29.txt>
+2022-08-22 10:18:15 Info      time start:      2020-07-29_00-00-00
+2022-08-22 10:18:15 Info      time end:        2020-07-29_23-59-58
+2022-08-22 10:18:15 Info      epochs:          43200
+2022-08-22 10:18:15 Info      median sampling: 2 seconds
+2022-08-22 10:18:15 Info      gaps:            0
+2022-08-22 10:18:15 Status  === Finished GROOPS ===

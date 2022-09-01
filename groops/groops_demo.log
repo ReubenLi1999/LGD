@@ -1,0 +1,339 @@
+2022-08-29 17:32:20 Status  === Starting GROOPS ===
+2022-08-29 17:32:20 Info    Config file: <00groopsIntegrateOrbit.xml>
+2022-08-29 17:32:20 Status  --- GraceAod2TimeSplines (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/de_2020-07-02.txt) ---
+2022-08-29 17:32:20 Status  read file <E:\lhsPrograms\gracefo_dataset\AOD1B_2020-07_06\AOD1B_2020-07-01_X_06.asc>
+2022-08-29 17:32:24 Status  read file <E:\lhsPrograms\gracefo_dataset\AOD1B_2020-07_06\AOD1B_2020-07-02_X_06.asc>
+2022-08-29 17:32:28 Status  read file <E:\lhsPrograms\gracefo_dataset\AOD1B_2020-07_06\AOD1B_2020-07-03_X_06.asc>
+2022-08-29 17:32:32 Status  write dealiasing data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/de_2020-07-02.txt>
+2022-08-29 17:32:33 Status  --- GroupPrograms (GRACE-C) ---
+2022-08-29 17:32:33 Status  --- GraceL1b2Orbit (E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-c_approximateOrbit_2020-07-02.txt) ---
+2022-08-29 17:32:34 Status  read input files
+2022-08-29 17:32:34 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\GNV1B_2020-07-02_C_04.txt>
+2022-08-29 17:32:38 Status  rotation from TRF to CRF
+2022-08-29 17:32:43 Status  86400 loops in time 00:00:05
+2022-08-29 17:32:43 Status  sort epochs
+2022-08-29 17:32:43 Status  eliminate duplicates
+2022-08-29 17:32:43 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:32:43 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:32:43 Info      epochs:          86400
+2022-08-29 17:32:43 Info      median sampling: 1 seconds
+2022-08-29 17:32:43 Info      gaps:            0
+2022-08-29 17:32:43 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-c_approximateOrbit_2020-07-02.txt>
+2022-08-29 17:32:46 Status  --- GraceL1b2StarCamera (E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-c_starCamera_2020-07-02.txt) ---
+2022-08-29 17:32:46 Status  read input files
+2022-08-29 17:32:46 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\SCA1B_2020-07-02_C_04.txt>
+2022-08-29 17:32:49 Status  sort epochs
+2022-08-29 17:32:49 Status  eliminate duplicates
+2022-08-29 17:32:49 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:32:49 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:32:49 Info      epochs:          86400
+2022-08-29 17:32:49 Info      median sampling: 1 seconds
+2022-08-29 17:32:49 Info      gaps:            0
+2022-08-29 17:32:49 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-c_starCamera_2020-07-02.txt>
+2022-08-29 17:32:51 Status  --- GraceL1b2Accelerometer (E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-c_accelerometer_2020-07-02.txt) ---
+2022-08-29 17:32:51 Status  read input files
+2022-08-29 17:32:51 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\ACT1B_2020-07-02_C_04.txt>
+2022-08-29 17:32:54 Status  sort epochs
+2022-08-29 17:32:54 Status  eliminate duplicates
+2022-08-29 17:32:54 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:32:54 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:32:54 Info      epochs:          86400
+2022-08-29 17:32:54 Info      median sampling: 1 seconds
+2022-08-29 17:32:54 Info      gaps:            0
+2022-08-29 17:32:54 Info    write linear  acceleration to <E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-c_accelerometer_2020-07-02.txt>
+2022-08-29 17:32:56 Status  --- GroupPrograms (GRACE-C) ---
+2022-08-29 17:32:56 Status  --- GraceL1b2Accelerometer (GRACE-C) ---
+2022-08-29 17:32:56 Status  read input files
+2022-08-29 17:32:56 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\ACT1B_2020-07-02_C_04.txt>
+2022-08-29 17:32:59 Status  sort epochs
+2022-08-29 17:32:59 Status  eliminate duplicates
+2022-08-29 17:32:59 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:32:59 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:32:59 Info      epochs:          86400
+2022-08-29 17:32:59 Info      median sampling: 1 seconds
+2022-08-29 17:32:59 Info      gaps:            0
+2022-08-29 17:32:59 Info    write linear  acceleration to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt>
+2022-08-29 17:33:01 Status  --- GraceL1b2Orbit (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_GNV1B_2020-07-02.txt) ---
+2022-08-29 17:33:02 Status  read input files
+2022-08-29 17:33:02 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\GNV1B_2020-07-02_C_04.txt>
+2022-08-29 17:33:05 Status  rotation from TRF to CRF
+2022-08-29 17:33:10 Status  86400 loops in time 00:00:05
+2022-08-29 17:33:10 Status  sort epochs
+2022-08-29 17:33:10 Status  eliminate duplicates
+2022-08-29 17:33:10 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:33:10 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:33:10 Info      epochs:          86400
+2022-08-29 17:33:10 Info      median sampling: 1 seconds
+2022-08-29 17:33:10 Info      gaps:            0
+2022-08-29 17:33:10 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_GNV1B_2020-07-02.txt>
+2022-08-29 17:33:13 Status  --- GraceL1b2StarCamera (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_SCA1B_2020-07-02.txt) ---
+2022-08-29 17:33:13 Status  read input files
+2022-08-29 17:33:13 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\SCA1B_2020-07-02_C_04.txt>
+2022-08-29 17:33:15 Status  sort epochs
+2022-08-29 17:33:15 Status  eliminate duplicates
+2022-08-29 17:33:15 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:33:15 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:33:15 Info      epochs:          86400
+2022-08-29 17:33:15 Info      median sampling: 1 seconds
+2022-08-29 17:33:15 Info      gaps:            0
+2022-08-29 17:33:15 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_SCA1B_2020-07-02.txt>
+2022-08-29 17:33:17 Status  --- InstrumentReduceSampling (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt) ---
+2022-08-29 17:33:17 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt> and reduce sampling
+2022-08-29 17:33:18 Status  1 loops in time 00:00:01
+2022-08-29 17:33:18 Status  write instrument data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt>
+2022-08-29 17:33:21 Status  --- InstrumentReduceSampling (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_GNV1B_2020-07-02.txt) ---
+2022-08-29 17:33:21 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_GNV1B_2020-07-02.txt> and reduce sampling
+2022-08-29 17:33:22 Status  1 loops in time 00:00:01
+2022-08-29 17:33:22 Status  write instrument data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_GNV1B_2020-07-02.txt>
+2022-08-29 17:33:25 Status  --- InstrumentReduceSampling (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_SCA1B_2020-07-02.txt) ---
+2022-08-29 17:33:25 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_SCA1B_2020-07-02.txt> and reduce sampling
+2022-08-29 17:33:26 Status  1 loops in time 00:00:01
+2022-08-29 17:33:26 Status  write instrument data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_SCA1B_2020-07-02.txt>
+2022-08-29 17:33:28 Status  --- InstrumentRemoveEpochsByCriteria (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt) ---
+2022-08-29 17:33:28 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt>
+2022-08-29 17:33:29 Status  evaluate criteria
+2022-08-29 17:33:32 Status  86400 loops in time 00:00:03
+2022-08-29 17:33:32 Info      0 epochs meet criteria
+2022-08-29 17:33:32 Info      0 epochs removed
+2022-08-29 17:33:32 Status  --- InstrumentSynchronize ---
+2022-08-29 17:33:32 Status  read instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt>
+2022-08-29 17:33:33 Info      epochs = 86400
+2022-08-29 17:33:33 Status  read instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_GNV1B_2020-07-02.txt>
+2022-08-29 17:33:34 Info      epochs = 86400
+2022-08-29 17:33:34 Status  read instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_SCA1B_2020-07-02.txt>
+2022-08-29 17:33:35 Info      epochs = 86400
+2022-08-29 17:33:35 Status  synchronize data
+2022-08-29 17:33:35 Status  delete asynchronize data
+2022-08-29 17:33:35 Status  divide arcs
+2022-08-29 17:33:35 Info      begin new arc by a time step of at least 1.5 seconds
+2022-08-29 17:33:35 Status  write instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt>
+2022-08-29 17:33:38 Status  write instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_GNV1B_2020-07-02.txt>
+2022-08-29 17:33:40 Status  write instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_SCA1B_2020-07-02.txt>
+2022-08-29 17:33:43 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:33:43 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:33:43 Info      epochs:          86400
+2022-08-29 17:33:43 Info      median sampling: 1 seconds
+2022-08-29 17:33:43 Info      gaps:            0
+2022-08-29 17:33:43 Status  --- SimulateAccelerometer (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACC1B_2020-07-02_SIMU.txt) ---
+2022-08-29 17:33:45 Status  computing accelerations
+2022-08-29 17:34:12 Status  1 loops in time 00:00:27
+2022-08-29 17:34:12 Status  write accelerometer data to file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACC1B_2020-07-02_SIMU.txt>
+2022-08-29 17:34:15 Status  --- InstrumentAccelerometerEstimateBiasScale (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACC1B_2020-07-02.txt) ---
+2022-08-29 17:34:15 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACT1B_2020-07-02.txt>
+2022-08-29 17:34:15 Status  read simulated instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACC1B_2020-07-02_SIMU.txt>
+2022-08-29 17:34:15 Status  estimate bias/scale
+2022-08-29 17:34:15 Info      parameter count = 3
+2022-08-29 17:34:17 Status  1 loops in time 00:00:02
+2022-08-29 17:34:19 Status  1 loops in time 00:00:02
+2022-08-29 17:34:19 Status  write calibrated accelerometer file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-c_ACC1B_2020-07-02.txt>
+2022-08-29 17:34:21 Status  --- InstrumentSynchronize (GRACE-C) ---
+2022-08-29 17:34:21 Status  read instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-c_accelerometer_2020-07-02.txt>
+2022-08-29 17:34:22 Info      epochs = 86400
+2022-08-29 17:34:22 Status  read instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-c_starCamera_2020-07-02.txt>
+2022-08-29 17:34:23 Info      epochs = 86400
+2022-08-29 17:34:23 Status  read instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-c_approximateOrbit_2020-07-02.txt>
+2022-08-29 17:34:25 Info      epochs = 86400
+2022-08-29 17:34:25 Status  synchronize data
+2022-08-29 17:34:25 Status  delete asynchronize data
+2022-08-29 17:34:25 Status  divide arcs
+2022-08-29 17:34:25 Info      begin new arc by a time step of at least 1.5 seconds
+2022-08-29 17:34:25 Status  write instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-c_accelerometer_2020-07-02.txt>
+2022-08-29 17:34:27 Status  write instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-c_starCamera_2020-07-02.txt>
+2022-08-29 17:34:29 Status  write instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-c_approximateOrbit_2020-07-02.txt>
+2022-08-29 17:34:32 Info      time start:      2020-07-02_00-00-00
+2022-08-29 17:34:32 Info      time end:        2020-07-02_23-59-59
+2022-08-29 17:34:32 Info      epochs:          86400
+2022-08-29 17:34:32 Info      median sampling: 1 seconds
+2022-08-29 17:34:32 Info      gaps:            0
+2022-08-29 17:34:32 Status  --- PreprocessingVariationalEquation (GRACE-C) ---
+2022-08-29 17:34:34 Status  integrate arcs
+2022-08-29 18:06:38 Status  1 loops in time 00:32:04
+2022-08-29 18:06:38 Info      max diff (orbit-reference orbit) 1.88463 m
+2022-08-29 18:06:38 Status  write variational equation to file <E:/lhsPrograms/Projects_2022/LGD/output/grace-c_variationalEquations_2020-07-02_JPL.txt>
+2022-08-29 18:07:11 Status  write orbit to file <E:/lhsPrograms/Projects_2022/LGD/output/grace-c_integratedOrbit_2020-07-02_JPL.txt>
+2022-08-29 18:07:14 Status  --- GroupPrograms (GRACE-D) ---
+2022-08-29 18:07:14 Status  --- GraceL1b2Orbit (E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-d_approximateOrbit_2020-07-02.txt) ---
+2022-08-29 18:07:15 Status  read input files
+2022-08-29 18:07:15 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\GNV1B_2020-07-02_D_04.txt>
+2022-08-29 18:07:19 Status  rotation from TRF to CRF
+2022-08-29 18:07:24 Status  86400 loops in time 00:00:05
+2022-08-29 18:07:24 Status  sort epochs
+2022-08-29 18:07:24 Status  eliminate duplicates
+2022-08-29 18:07:24 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:07:24 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:07:24 Info      epochs:          86400
+2022-08-29 18:07:24 Info      median sampling: 1 seconds
+2022-08-29 18:07:24 Info      gaps:            0
+2022-08-29 18:07:24 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-d_approximateOrbit_2020-07-02.txt>
+2022-08-29 18:07:27 Status  --- GraceL1b2StarCamera (E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-d_starCamera_2020-07-02.txt) ---
+2022-08-29 18:07:27 Status  read input files
+2022-08-29 18:07:28 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\SCA1B_2020-07-02_D_04.txt>
+2022-08-29 18:07:30 Status  sort epochs
+2022-08-29 18:07:30 Status  eliminate duplicates
+2022-08-29 18:07:30 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:07:30 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:07:30 Info      epochs:          86400
+2022-08-29 18:07:30 Info      median sampling: 1 seconds
+2022-08-29 18:07:30 Info      gaps:            0
+2022-08-29 18:07:30 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-d_starCamera_2020-07-02.txt>
+2022-08-29 18:07:32 Status  --- GraceL1b2Accelerometer (E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-d_accelerometer_2020-07-02.txt) ---
+2022-08-29 18:07:32 Status  read input files
+2022-08-29 18:07:32 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\ACT1B_2020-07-02_D_04.txt>
+2022-08-29 18:07:35 Status  sort epochs
+2022-08-29 18:07:35 Status  eliminate duplicates
+2022-08-29 18:07:35 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:07:35 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:07:35 Info      epochs:          86400
+2022-08-29 18:07:35 Info      median sampling: 1 seconds
+2022-08-29 18:07:35 Info      gaps:            0
+2022-08-29 18:07:35 Info    write linear  acceleration to <E:/lhsPrograms/Projects_2022/LGD/input/demo/grace-d_accelerometer_2020-07-02.txt>
+2022-08-29 18:07:38 Status  --- GroupPrograms (GRACE-D) ---
+2022-08-29 18:07:38 Status  --- GraceL1b2Accelerometer (GRACE-D) ---
+2022-08-29 18:07:38 Status  read input files
+2022-08-29 18:07:38 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\ACT1B_2020-07-02_D_04.txt>
+2022-08-29 18:07:41 Status  sort epochs
+2022-08-29 18:07:41 Status  eliminate duplicates
+2022-08-29 18:07:41 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:07:41 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:07:41 Info      epochs:          86400
+2022-08-29 18:07:41 Info      median sampling: 1 seconds
+2022-08-29 18:07:41 Info      gaps:            0
+2022-08-29 18:07:41 Info    write linear  acceleration to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt>
+2022-08-29 18:07:44 Status  --- GraceL1b2Orbit (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_GNV1B_2020-07-02.txt) ---
+2022-08-29 18:07:44 Status  read input files
+2022-08-29 18:07:44 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\GNV1B_2020-07-02_D_04.txt>
+2022-08-29 18:07:48 Status  rotation from TRF to CRF
+2022-08-29 18:07:54 Status  86400 loops in time 00:00:06
+2022-08-29 18:07:54 Status  sort epochs
+2022-08-29 18:07:54 Status  eliminate duplicates
+2022-08-29 18:07:54 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:07:54 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:07:54 Info      epochs:          86400
+2022-08-29 18:07:54 Info      median sampling: 1 seconds
+2022-08-29 18:07:54 Info      gaps:            0
+2022-08-29 18:07:54 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_GNV1B_2020-07-02.txt>
+2022-08-29 18:07:57 Status  --- GraceL1b2StarCamera (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_SCA1B_2020-07-02.txt) ---
+2022-08-29 18:07:57 Status  read input files
+2022-08-29 18:07:57 Status  read file <E:\lhsPrograms\gracefo_dataset\gracefo_1B_2020-07-02_RL04.ascii.noLRI\SCA1B_2020-07-02_D_04.txt>
+2022-08-29 18:07:59 Status  sort epochs
+2022-08-29 18:07:59 Status  eliminate duplicates
+2022-08-29 18:07:59 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:07:59 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:07:59 Info      epochs:          86400
+2022-08-29 18:07:59 Info      median sampling: 1 seconds
+2022-08-29 18:07:59 Info      gaps:            0
+2022-08-29 18:07:59 Info    write data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_SCA1B_2020-07-02.txt>
+2022-08-29 18:08:01 Status  --- InstrumentReduceSampling (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt) ---
+2022-08-29 18:08:01 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt> and reduce sampling
+2022-08-29 18:08:02 Status  1 loops in time 00:00:01
+2022-08-29 18:08:02 Status  write instrument data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt>
+2022-08-29 18:08:05 Status  --- InstrumentReduceSampling (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_GNV1B_2020-07-02.txt) ---
+2022-08-29 18:08:05 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_GNV1B_2020-07-02.txt> and reduce sampling
+2022-08-29 18:08:06 Status  1 loops in time 00:00:01
+2022-08-29 18:08:06 Status  write instrument data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_GNV1B_2020-07-02.txt>
+2022-08-29 18:08:09 Status  --- InstrumentReduceSampling (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_SCA1B_2020-07-02.txt) ---
+2022-08-29 18:08:09 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_SCA1B_2020-07-02.txt> and reduce sampling
+2022-08-29 18:08:10 Status  1 loops in time 00:00:01
+2022-08-29 18:08:10 Status  write instrument data to <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_SCA1B_2020-07-02.txt>
+2022-08-29 18:08:13 Status  --- InstrumentRemoveEpochsByCriteria (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt) ---
+2022-08-29 18:08:13 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt>
+2022-08-29 18:08:14 Status  evaluate criteria
+2022-08-29 18:08:17 Status  86400 loops in time 00:00:03
+2022-08-29 18:08:17 Info      0 epochs meet criteria
+2022-08-29 18:08:17 Info      0 epochs removed
+2022-08-29 18:08:17 Status  --- InstrumentSynchronize ---
+2022-08-29 18:08:17 Status  read instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt>
+2022-08-29 18:08:18 Info      epochs = 86400
+2022-08-29 18:08:18 Status  read instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_GNV1B_2020-07-02.txt>
+2022-08-29 18:08:19 Info      epochs = 86400
+2022-08-29 18:08:19 Status  read instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_SCA1B_2020-07-02.txt>
+2022-08-29 18:08:20 Info      epochs = 86400
+2022-08-29 18:08:20 Status  synchronize data
+2022-08-29 18:08:20 Status  delete asynchronize data
+2022-08-29 18:08:20 Status  divide arcs
+2022-08-29 18:08:20 Info      begin new arc by a time step of at least 1.5 seconds
+2022-08-29 18:08:20 Status  write instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt>
+2022-08-29 18:08:23 Status  write instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_GNV1B_2020-07-02.txt>
+2022-08-29 18:08:26 Status  write instrument file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_SCA1B_2020-07-02.txt>
+2022-08-29 18:08:29 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:08:29 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:08:29 Info      epochs:          86400
+2022-08-29 18:08:29 Info      median sampling: 1 seconds
+2022-08-29 18:08:29 Info      gaps:            0
+2022-08-29 18:08:29 Status  --- SimulateAccelerometer (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACC1B_2020-07-02_SIMU.txt) ---
+2022-08-29 18:08:32 Status  computing accelerations
+2022-08-29 18:09:01 Status  1 loops in time 00:00:29
+2022-08-29 18:09:01 Status  write accelerometer data to file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACC1B_2020-07-02_SIMU.txt>
+2022-08-29 18:09:03 Status  --- InstrumentAccelerometerEstimateBiasScale (E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACC1B_2020-07-02.txt) ---
+2022-08-29 18:09:03 Status  read instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACT1B_2020-07-02.txt>
+2022-08-29 18:09:03 Status  read simulated instrument data <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACC1B_2020-07-02_SIMU.txt>
+2022-08-29 18:09:03 Status  estimate bias/scale
+2022-08-29 18:09:03 Info      parameter count = 3
+2022-08-29 18:09:06 Status  1 loops in time 00:00:03
+2022-08-29 18:09:08 Status  1 loops in time 00:00:02
+2022-08-29 18:09:08 Status  write calibrated accelerometer file <E:/lhsPrograms/Projects_2022/LGD/input/2020-07-02/gracefo-d_ACC1B_2020-07-02.txt>
+2022-08-29 18:09:11 Status  --- InstrumentSynchronize (GRACE-D) ---
+2022-08-29 18:09:11 Status  read instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-d_accelerometer_2020-07-02.txt>
+2022-08-29 18:09:12 Info      epochs = 86400
+2022-08-29 18:09:12 Status  read instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-d_starCamera_2020-07-02.txt>
+2022-08-29 18:09:13 Info      epochs = 86400
+2022-08-29 18:09:13 Status  read instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-d_approximateOrbit_2020-07-02.txt>
+2022-08-29 18:09:14 Info      epochs = 86400
+2022-08-29 18:09:14 Status  synchronize data
+2022-08-29 18:09:14 Status  delete asynchronize data
+2022-08-29 18:09:14 Status  divide arcs
+2022-08-29 18:09:14 Info      begin new arc by a time step of at least 1.5 seconds
+2022-08-29 18:09:14 Status  write instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-d_accelerometer_2020-07-02.txt>
+2022-08-29 18:09:16 Status  write instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-d_starCamera_2020-07-02.txt>
+2022-08-29 18:09:19 Status  write instrument file <E:\lhsPrograms\Projects_2022\LGD\input\demo\grace-d_approximateOrbit_2020-07-02.txt>
+2022-08-29 18:09:22 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:09:22 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:09:22 Info      epochs:          86400
+2022-08-29 18:09:22 Info      median sampling: 1 seconds
+2022-08-29 18:09:22 Info      gaps:            0
+2022-08-29 18:09:22 Status  --- PreprocessingVariationalEquation (GRACE-D) ---
+2022-08-29 18:09:23 Status  integrate arcs
+2022-08-29 18:38:34 Status  1 loops in time 00:29:11
+2022-08-29 18:38:34 Info      max diff (orbit-reference orbit) 1.82509 m
+2022-08-29 18:38:34 Status  write variational equation to file <E:/lhsPrograms/Projects_2022/LGD/output/grace-d_variationalEquations_2020-07-02_JPL.txt>
+2022-08-29 18:39:08 Status  write orbit to file <E:/lhsPrograms/Projects_2022/LGD/output/grace-d_integratedOrbit_2020-07-02_JPL.txt>
+2022-08-29 18:39:11 Status  --- PreprocessingVariationalEquationOrbitFit (GRACE-C) ---
+2022-08-29 18:39:17 Status  accumulate normal equations
+2022-08-29 18:39:25 Status  1 loops in time 00:00:08
+2022-08-29 18:39:25 Status  solve system of normal equations
+2022-08-29 18:39:25 Info      aposteriori sigma: 0
+2022-08-29 18:39:25 Info      outlier 0 of 259200 (0%)
+2022-08-29 18:39:25 Info      parameter count = 12
+2022-08-29 18:39:25 Status  accumulate normal equations
+2022-08-29 18:39:32 Status  1 loops in time 00:00:07
+2022-08-29 18:39:32 Status  solve system of normal equations
+2022-08-29 18:39:32 Info      aposteriori sigma: 0
+2022-08-29 18:39:32 Info      outlier 0 of 259200 (0%)
+2022-08-29 18:39:44 Status  1 loops in time 00:00:12
+2022-08-29 18:39:44 Status  write variational equation to file <E:\lhsPrograms\Projects_2022\LGD\output\grace-c_variationalEquationsFit_2020-07-02_JPL.txt>
+2022-08-29 18:40:20 Status  write orbit to file <E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_2020-07-02_JPL.txt>
+2022-08-29 18:40:23 Status  --- PreprocessingVariationalEquationOrbitFit (GRACE-D) ---
+2022-08-29 18:40:29 Status  accumulate normal equations
+2022-08-29 18:40:37 Status  1 loops in time 00:00:08
+2022-08-29 18:40:37 Status  solve system of normal equations
+2022-08-29 18:40:37 Info      aposteriori sigma: 0
+2022-08-29 18:40:37 Info      outlier 0 of 259200 (0%)
+2022-08-29 18:40:37 Info      parameter count = 12
+2022-08-29 18:40:37 Status  accumulate normal equations
+2022-08-29 18:40:44 Status  1 loops in time 00:00:07
+2022-08-29 18:40:44 Status  solve system of normal equations
+2022-08-29 18:40:44 Info      aposteriori sigma: 0
+2022-08-29 18:40:44 Info      outlier 0 of 259200 (0%)
+2022-08-29 18:40:56 Status  1 loops in time 00:00:12
+2022-08-29 18:40:56 Status  write variational equation to file <E:\lhsPrograms\Projects_2022\LGD\output\grace-d_variationalEquationsFit_2020-07-02_JPL.txt>
+2022-08-29 18:41:28 Status  write orbit to file <E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_2020-07-02_JPL.txt>
+2022-08-29 18:41:32 Status  --- SimulateSatelliteTracking (E:\lhsPrograms\Projects_2022\LGD\output\grace-fo_satelliteTracking_2020-07-02_JPL.txt) ---
+2022-08-29 18:41:32 Status  read orbits and generate tracking data
+2022-08-29 18:41:34 Status  1 loops in time 00:00:02
+2022-08-29 18:41:34 Status  write tracking data to file <E:\lhsPrograms\Projects_2022\LGD\output\grace-fo_satelliteTracking_2020-07-02_JPL.txt>
+2022-08-29 18:41:37 Info      time start:      2020-07-02_00-00-00
+2022-08-29 18:41:37 Info      time end:        2020-07-02_23-59-59
+2022-08-29 18:41:37 Info      epochs:          86400
+2022-08-29 18:41:37 Info      median sampling: 1 seconds
+2022-08-29 18:41:37 Info      gaps:            0
+2022-08-29 18:41:37 Status  === Finished GROOPS ===
