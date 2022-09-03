@@ -63,7 +63,7 @@ def rainf():
     hours = ["0000", "0300", "0600", "0900", "1200", "1500", "1800", "2100"]
 
     for id, hour in enumerate(hours):
-        fn = nc.Dataset(f"D:/Downloads/gfo_dataset/GLDAS_NOAH025_3H.A{date4plot}.{hour}.021.nc4")
+        fn = nc.Dataset(f"D:/Downloads/GLDAS/GLDAS_NOAH025_3H.A{date4plot}.{hour}.021.nc4")
         fig, ax = plt.subplots(figsize=(16, 8))
         cm = plt.cm.get_cmap("jet")
         plt.pcolormesh(Lon, Lat, fn["Rainf_tavg"][0].T, cmap=cm)
