@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<groops>
+	<global>
+		<filename label="groopsDataDir">D:/Downloads/data</filename>
+	</global>
+	<program comment="E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_grid.txt" disabled="1">
+		<MatrixRectangular2GriddedData>
+			<outputfileGriddedData>E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_grid.txt</outputfileGriddedData>
+			<inputfileMatrix>E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702.csv</inputfileMatrix>
+			<rowMajor>1</rowMajor>
+			<startLongitude>-179.875</startLongitude>
+			<startLatitude>89.875</startLatitude>
+			<deltaLongitude>0.25</deltaLongitude>
+			<deltaLatitude>0.25</deltaLatitude>
+			<R>6378137.0</R>
+			<inverseFlattening>298.2572221010</inverseFlattening>
+		</MatrixRectangular2GriddedData>
+	</program>
+	<program comment="E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_potential.txt" disabled="1">
+		<GriddedData2PotentialCoefficients>
+			<outputfilePotentialCoefficients>E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_potential.txt</outputfilePotentialCoefficients>
+			<inputfileGriddedData>E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_grid.txt</inputfileGriddedData>
+			<value>data0</value>
+			<weight>area</weight>
+			<kernel>
+				<waterHeight>
+					<density>1025</density>
+					<inputfileLoadingLoveNumber>{groopsDataDir}/loading/loadLoveNumbers_Gegout97.txt</inputfileLoadingLoveNumber>
+				</waterHeight>
+			</kernel>
+			<minDegree>0</minDegree>
+			<maxDegree>60</maxDegree>
+			<GM>3.986004415e+14</GM>
+			<R>6378136.3</R>
+			<leastSquares>0</leastSquares>
+		</GriddedData2PotentialCoefficients>
+	</program>
+	<program comment="E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_gravity_demo.txt">
+		<Gravityfield2AbsoluteGravity>
+			<outputfileGriddedData>E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_gravity_demo.txt</outputfileGriddedData>
+			<grid>
+				<geograph>
+					<deltaLambda>1</deltaLambda>
+					<deltaPhi>1</deltaPhi>
+					<height>450000</height>
+					<R>6378137.0</R>
+					<inverseFlattening>298.2572221010</inverseFlattening>
+				</geograph>
+			</grid>
+			<gravityfield>
+				<potentialCoefficients>
+					<inputfilePotentialCoefficients>E:\lhsPrograms\Projects_2022\LGD\input\soilMoisture\20210702_potential.txt</inputfilePotentialCoefficients>
+					<minDegree>0</minDegree>
+					<factor>1.0</factor>
+					<setSigmasToZero>0</setSigmasToZero>
+				</potentialCoefficients>
+			</gravityfield>
+			<factor>1.0</factor>
+			<R>6378137.0</R>
+			<inverseFlattening>298.2572221010</inverseFlattening>
+		</Gravityfield2AbsoluteGravity>
+	</program>
+</groops>

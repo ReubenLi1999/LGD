@@ -2,14 +2,14 @@
 <groops>
 	<global>
 		<filename label="groopsDataDir">D:/Downloads/data</filename>
-		<string label="dateBefore">2021-07-21</string>
-		<string label="date4int">2021-07-22</string>
-		<string label="dateAfter">2021-07-23</string>
+		<string label="dateBefore">2021-07-02</string>
+		<string label="date4int">2021-07-02</string>
+		<string label="dateAfter">2020-07-03</string>
 		<string label="workspace">E:/lhsPrograms/Projects_2022/LGD</string>
-		<string label="backgroundmodel">JPL202107</string>
+		<string label="backgroundmodel">GOCO06</string>
 		<double label="resampleInterval">1</double>
 		<string label="instrumentSST">kbr</string>
-		<filename label="potentialFile">D:\Downloads\data\potential\JPL_JPL-Release-06-GFO_96x96_DDK7\kfilter_DDK7_GSM-2_2021152-2021181_GRFO_JPLEM_BB01_0600.gfc</filename>
+		<filename label="potentialFile">D:\Downloads\data\potential\goco06s\GOCO06s_static_2010-01-01.gfc</filename>
 		<string label="tmpDir">E:/lhsPrograms/Projects_2022/LGD/tmp</string>
 	</global>
 	<program comment="CreateDir" disabled="1">
@@ -1424,6 +1424,42 @@
 								<factor>1.0</factor>
 							</timeSplines>
 						</gravityfield>
+						<gravityfield>
+							<trend>
+								<gravityfield>
+									<potentialCoefficients>
+										<inputfilePotentialCoefficients>D:\Downloads\data\potential\goco06s\GOCO06s_trend_2010-01-01.gfc</inputfilePotentialCoefficients>
+										<minDegree>2</minDegree>
+										<factor>1.0</factor>
+										<setSigmasToZero>0</setSigmasToZero>
+									</potentialCoefficients>
+								</gravityfield>
+								<timeStart>55197+12/24</timeStart>
+								<timeStep>365.25</timeStep>
+							</trend>
+						</gravityfield>
+						<gravityfield>
+							<oscillation>
+								<gravityfieldCos>
+									<potentialCoefficients>
+										<inputfilePotentialCoefficients>D:\Downloads\data\potential\goco06s\GOCO06s_annualCos_2010-01-01.gfc</inputfilePotentialCoefficients>
+										<minDegree>2</minDegree>
+										<factor>1.0</factor>
+										<setSigmasToZero>0</setSigmasToZero>
+									</potentialCoefficients>
+								</gravityfieldCos>
+								<gravityfieldSin>
+									<potentialCoefficients>
+										<inputfilePotentialCoefficients>D:\Downloads\data\potential\goco06s\GOCO06s_annualSin_2010-01-01.gfc</inputfilePotentialCoefficients>
+										<minDegree>2</minDegree>
+										<factor>1.0</factor>
+										<setSigmasToZero>0</setSigmasToZero>
+									</potentialCoefficients>
+								</gravityfieldSin>
+								<time0>51544.5</time0>
+								<period>365.25</period>
+							</oscillation>
+						</gravityfield>
 						<tides>
 							<astronomicalTide>
 								<useMoon>1</useMoon>
@@ -1764,6 +1800,42 @@
 								<minDegree>0</minDegree>
 								<factor>1.0</factor>
 							</timeSplines>
+						</gravityfield>
+						<gravityfield>
+							<trend>
+								<gravityfield>
+									<potentialCoefficients>
+										<inputfilePotentialCoefficients>D:\Downloads\data\potential\goco06s\GOCO06s_trend_2010-01-01.gfc</inputfilePotentialCoefficients>
+										<minDegree>2</minDegree>
+										<factor>1.0</factor>
+										<setSigmasToZero>0</setSigmasToZero>
+									</potentialCoefficients>
+								</gravityfield>
+								<timeStart>55197+12/24</timeStart>
+								<timeStep>365.25</timeStep>
+							</trend>
+						</gravityfield>
+						<gravityfield>
+							<oscillation>
+								<gravityfieldCos>
+									<potentialCoefficients>
+										<inputfilePotentialCoefficients>D:\Downloads\data\potential\goco06s\GOCO06s_annualCos_2010-01-01.gfc</inputfilePotentialCoefficients>
+										<minDegree>2</minDegree>
+										<factor>1.0</factor>
+										<setSigmasToZero>0</setSigmasToZero>
+									</potentialCoefficients>
+								</gravityfieldCos>
+								<gravityfieldSin>
+									<potentialCoefficients>
+										<inputfilePotentialCoefficients>D:\Downloads\data\potential\goco06s\GOCO06s_annualSin_2010-01-01.gfc</inputfilePotentialCoefficients>
+										<minDegree>2</minDegree>
+										<factor>1.0</factor>
+										<setSigmasToZero>0</setSigmasToZero>
+									</potentialCoefficients>
+								</gravityfieldSin>
+								<time0>51544.5</time0>
+								<period>365.25</period>
+							</oscillation>
 						</gravityfield>
 						<gravityfield disabled="1">
 							<timeSplines>

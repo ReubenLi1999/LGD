@@ -10,6 +10,8 @@ from scipy.sparse.linalg import lsqr
 from matplotlib.patches import Rectangle
 import datetime
 import netCDF4 as nc
+import time
+import os
 
 
 def nan_helper(y):
@@ -21,10 +23,6 @@ def nan_helper(y):
         - nans, logical indices of NaNs
         - index, a function, with signature indices= index(logical_indices),
           to convert logical indices of NaNs to 'equivalent' indices
-    Example:
-        >>> # linear interpolation of NaNs
-        >>> nans, x= nan_helper(y)
-        >>> y[nans]= np.interp(x(nans), x(~nans), y[~nans])
     """
 
     return np.isnan(y), lambda z: z.nonzero()[0]
@@ -50,26 +48,6 @@ def lpsd(x, windowfcn, fmin, fmax, Jdes, Kdes, Kmin, fs, xi):
         [2] Michael Tröbs and Gerhard Heinzel, Corrigendum to "Improved
         spectrum estimation from digitized time series on a logarithmic
         frequency axis."
-    Author(s): Tobin Fricke <tobin.fricke@ligo.org> 2012-04-17
-    :param x: time series to be transformed. "We assume to have a long stream x(n), n=0, ..., N-1 of equally spaced
-        input data sampled with frequency fs. Typical values for N range from 10^4 to >10^6" - Section 8 of [1]
-    :param windowfcn: function handle to windowing function (e.g. @hanning) "Choose a window function w(j, l) to reduce
-        spectral leakage within the estimate. ... The computations of the window function will be performed when the
-        segment lengths L(j) have been determined." - Section 8 of [1]
-    :param fmin: lowest frequency to estimate. "... we propose not to use the first few frequency bins. The first
-        frequency bin that yields unbiased spectral estimates depends on the window function used. The bin is given by
-        the effective half-width of the window transfer function." - Section 7 of [1].
-    :param fmax: highest frequency to estimate
-    :param Jdes: desired number of Fourier frequencies. "A typical value for J is 1000" - Section 8 of [1]
-    :param Kdes: desired number of averages
-    :param Kmin: minimum number of averages
-    :param fs: sampling rate
-    :param xi: fractional overlap between segments (0 <= xi < 1). See Figures 5 and 6. "The amount of overlap is a
-        trade-off between computational effort and flatness of the data weighting." [1]
-    :return: Pxx, f, C
-        - Pxx: vector of (uncalibrated) power spectrum estimates
-        - f: vector of frequencies corresponding to Pxx
-        - C: dict containing calibration factors to calibrate Pxx into either power spectral density or power spectrum.
     """
 
     # Sanity check the input arguments
@@ -132,7 +110,6 @@ def lpsd(x, windowfcn, fmin, fmax, Jdes, Kdes, Kmin, fs, xi):
 
     # Loop over frequencies.  For each frequency, we basically conduct Welch's method with the fourier transform length
     # chosen differently for each frequency.
-    # TODO: Try to eliminate the for loop completely, since it is unpythonic and slow. Maybe write doctests first...
     for jj in range(len(f)):
         # Calculate the number of segments
         D = int(np.around((1 - xi) * L[jj]))  # (2)
@@ -268,60 +245,73 @@ def lgd2mass(source_locations, coor_c, coor_d, los, lgd, lat, flag):
     return np.sum(m)
 
 
-def get_soil_moisture(background, lat_span, lon_span):
-    # monthly mean GLDAS dataset
-    gldas_monthly_mean = nc.Dataset(f"D:/Downloads/GLDAS/GLDAS_monthlymean/GLDAS_NOAH025_M.A{background[-6:]}.021.nc4")
+def get_soil_moisture(background, lat_span, lon_span, resolution, flag):
+    if flag == "GLDAS":
+        # monthly mean GLDAS dataset
+        if resolution == "monthly":
+            gldas_monthly_mean = nc.Dataset(f"D:/Downloads/GLDAS/monthly/GLDAS_NOAH025_M.A{background[-6:]}.021.nc4")
+        elif resolution == "daily":
+            gldas_monthly_mean = nc.Dataset(f"D:/Downloads/GLDAS/three_hours/GLDAS_NOAH025_3H.A{background.strftime('%Y%m%d')}.0600.021.nc4")
+        else:
+            gldas_monthly_mean = []
 
-    # coordinates of the grid points of GLDAS
-    # layer 1
-    x_1 = np.loadtxt("../input/x_GLDAS_0.25x0.25_1.txt")
-    y_1 = np.loadtxt("../input/y_GLDAS_0.25x0.25_1.txt")
-    z_1 = np.loadtxt("../input/z_GLDAS_0.25x0.25_1.txt")
-    # layer 2
-    x_2 = np.loadtxt("../input/x_GLDAS_0.25x0.25_2.txt")
-    y_2 = np.loadtxt("../input/y_GLDAS_0.25x0.25_2.txt")
-    z_2 = np.loadtxt("../input/z_GLDAS_0.25x0.25_2.txt")
-    # layer 3
-    x_3 = np.loadtxt("../input/x_GLDAS_0.25x0.25_3.txt")
-    y_3 = np.loadtxt("../input/y_GLDAS_0.25x0.25_3.txt")
-    z_3 = np.loadtxt("../input/z_GLDAS_0.25x0.25_3.txt")
-    # layer 4
-    x_4 = np.loadtxt("../input/x_GLDAS_0.25x0.25_4.txt")
-    y_4 = np.loadtxt("../input/y_GLDAS_0.25x0.25_4.txt")
-    z_4 = np.loadtxt("../input/z_GLDAS_0.25x0.25_4.txt")
+        # load coordinates
+        x = np.loadtxt("../input/x_GLDAS_0.25x0.25_3.txt")
+        y = np.loadtxt("../input/y_GLDAS_0.25x0.25_3.txt")
+        z = np.loadtxt("../input/z_GLDAS_0.25x0.25_3.txt")
 
-    # soil moisture in kg*m^-2
-    lat_a = np.loadtxt("../input/2020-07-02/lat.csv", delimiter=",")
-    lon_a = np.loadtxt("../input/2020-07-02/lon.csv", delimiter=",")
+        # soil moisture in kg*m^-2
+        lat_a = np.loadtxt("../input/2020-07-02/lat.csv", delimiter=",")
+        lon_a = np.loadtxt("../input/2020-07-02/lon.csv", delimiter=",")
 
-    som_1 = np.asarray(gldas_monthly_mean["SoilMoi0_10cm_inst"][0])
-    som_2 = np.asarray(gldas_monthly_mean["SoilMoi10_40cm_inst"][0])
-    som_3 = np.asarray(gldas_monthly_mean["SoilMoi40_100cm_inst"][0])
-    som_4 = np.asarray(gldas_monthly_mean["SoilMoi100_200cm_inst"][0])
+        som_1 = np.asarray(gldas_monthly_mean["SoilMoi0_10cm_inst"][0])
+        som_2 = np.asarray(gldas_monthly_mean["SoilMoi10_40cm_inst"][0])
+        som_3 = np.asarray(gldas_monthly_mean["SoilMoi40_100cm_inst"][0])
+        som_4 = np.asarray(gldas_monthly_mean["SoilMoi100_200cm_inst"][0])
+        som = som_1 + som_2 + som_3 + som_4
+    else:
+        main_dir = "D:/Downloads/MERRA2/"
+        # get constants
+        cons = nc.Dataset(f"{main_dir}MERRA2_100.const_2d_lnd_Nx.00000000.nc4")
+        # monthly mean GLDAS dataset
+        if resolution == "monthly":
+            gldas_monthly_mean = get_monthly_mean(2021, 6, "PRMC")
+        elif resolution == "daily":
+            gldas_monthly_mean = np.asarray(nc.Dataset(F"d:/Downloads/MERRA2/2021-07/MERRA2_401.tavg1_2d_lnd_Nx.{background.strftime('%Y%m%d')}.nc4")["PRMC"][0, :, :])
+        else:
+            gldas_monthly_mean = []
+
+        # load coordinates
+        x = np.loadtxt("../output/merra2_pr_x.txt")
+        y = np.loadtxt("../output/merra2_pr_y.txt")
+        z = np.loadtxt("../output/merra2_pr_z.txt")
+
+        # soil moisture in kg*m^-2
+        lat_a = np.arange(-90., 90.5, 0.5)
+        lon_a = np.arange(-180., 180., 0.625)
+
+        som = gldas_monthly_mean * np.asarray(cons["dzpr"][0, :, :]) * 1000
+
     # define wgs84 as crs
     geod = Geod('+a=6378137 +f=0.0033528106647475126')
     # area for each segment
-    res1 = []
-    res2 = []
-    res3 = []
-    res4 = []
+    res = []
     for id_lat, lat in enumerate(lat_a):
         for id_lon, lon in enumerate(lon_a):
-            lat_small = lat - 0.125
-            lat_large = lat + 0.125
-            lon_small = lon - 0.125
-            lon_large = lon + 0.125
             if np.logical_and(np.logical_and(lat >= lat_span[0], lat <= lat_span[1]),
                               np.logical_and(lon >= lon_span[0], lon <= lon_span[1])):
-                if som_1[id_lat, id_lon] > -100.0:
-                    area, _ = geod.polygon_area_perimeter([lon_large, lon_large, lon_small, lon_small],
-                                                              [lat_large, lat_small, lat_small, lat_large])
-                    res1.append([x_1[id_lon, id_lat], y_1[id_lon, id_lat], z_1[id_lon, id_lat], abs(area) * som_1[id_lat, id_lon]])
-                    res2.append([x_2[id_lon, id_lat], y_2[id_lon, id_lat], z_2[id_lon, id_lat], abs(area) * som_2[id_lat, id_lon]])
-                    res3.append([x_3[id_lon, id_lat], y_3[id_lon, id_lat], z_3[id_lon, id_lat], abs(area) * som_3[id_lat, id_lon]])
-                    res4.append([x_4[id_lon, id_lat], y_4[id_lon, id_lat], z_4[id_lon, id_lat], abs(area) * som_4[id_lat, id_lon]])
+                if np.logical_and(som[id_lat, id_lon] > -500.0, som[id_lat, id_lon] < 50000.0):
 
-    return np.asarray(res1), np.asarray(res2), np.asarray(res3), np.asarray(res4)
+                    lat_small = lat - (lat_a[2] - lat_a[1]) / 2
+                    lat_large = lat + (lat_a[2] - lat_a[1]) / 2
+                    lon_small = lon - (lon_a[2] - lon_a[1]) / 2
+                    lon_large = lon + (lon_a[2] - lon_a[1]) / 2
+
+                    area, _ = geod.polygon_area_perimeter([lon_large, lon_large, lon_small, lon_small],
+                                                          [lat_large, lat_small, lat_small, lat_large])
+                    res.append([x[id_lat, id_lon], y[id_lat, id_lon], z[id_lat, id_lon], abs(area) * som[id_lat, id_lon]])
+
+    return np.asarray(res)
 
 
 def antialias_filter(interval, sig, flag):
@@ -375,18 +365,31 @@ def load_data(date4lgd, back):
     kbr_x = np.loadtxt(f"E:\lhsPrograms\gracefo_dataset\gracefo_1B_{date4lgd}_RL04.ascii.noLRI\KBR1B_{date4lgd}_Y_04.txt",
                        dtype=np.float64,
                        skiprows=162)
-    if back == "background202106":
+    if back == "background202107":
+        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL202107.txt", skiprows=6)
+        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL202107.txt",
+                           skiprows=6)
+        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL202107.txt",
+                           skiprows=6)
+    elif back == "background202106":
+        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL.txt", skiprows=6)
+        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL.txt",
+                           skiprows=6)
+        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL.txt",
+                           skiprows=6)
+    elif back == "background202005":
         sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL.txt", skiprows=6)
         pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL.txt",
                            skiprows=6)
         pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL.txt",
                            skiprows=6)
     else:
-        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL202107.txt", skiprows=6)
-        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL202107.txt",
+        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_GOCO06.txt", skiprows=6)
+        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_GOCO06.txt",
                            skiprows=6)
-        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL202107.txt",
+        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_GOCO06.txt",
                            skiprows=6)
+
     gnv_c = np.loadtxt(f"E:\lhsPrograms\gracefo_dataset\gracefo_1B_{date4lgd}_RL04.ascii.noLRI\GNV1B_{date4lgd}_C_04.txt",
                        skiprows=148,
                        usecols=[3, 4, 5])[::2]
@@ -410,83 +413,50 @@ def load_data(date4lgd, back):
     return kbr_x, pod_c, pod_d, gnv_c, gnv_d, lri_x, grd, sst
 
 
-def get_soil_moisture_diff():
+def get_soil_moisture_diff(background, this):
     # soil moisture grid
     lat = np.loadtxt("../input/2020-07-29/lat.csv", delimiter=",")
     lon = np.loadtxt("../input/2020-07-29/lon.csv", delimiter=",")
-    Lat, Lon = np.meshgrid(lat, lon)
+    lat, lon = np.meshgrid(lat, lon)
     # soil moisture before the flood
-    som_1_b = np.loadtxt("../input/2021-07-01/SoilMoi0_10cm_inst.csv", delimiter=",")
-    som_2_b = np.loadtxt("../input/2021-07-01/SoilMoi10_40cm_inst.csv", delimiter=",")
-    som_3_b = np.loadtxt("../input/2021-07-01/SoilMoi40_100cm_inst.csv", delimiter=",")
-    som_4_b = np.loadtxt("../input/2021-07-01/SoilMoi100_200cm_inst.csv", delimiter=",")
+    # monthly mean GLDAS dataset
+    gldas_monthly_mean = nc.Dataset(f"D:/Downloads/GLDAS/monthly/GLDAS_NOAH025_M.A{background[-6:]}.021.nc4")
+    gldas_daily_mean = nc.Dataset(f"D:/Downloads/GLDAS/three_hours/GLDAS_NOAH025_3H.A{this.strftime('%Y%m%d')}.0600.021.nc4")
+
+    som_1_b = np.asarray(gldas_monthly_mean["SoilMoi0_10cm_inst"][0])
+    som_2_b = np.asarray(gldas_monthly_mean["SoilMoi10_40cm_inst"][0])
+    som_3_b = np.asarray(gldas_monthly_mean["SoilMoi40_100cm_inst"][0])
+    som_4_b = np.asarray(gldas_monthly_mean["SoilMoi100_200cm_inst"][0])
+
+    som_1_a = np.asarray(gldas_daily_mean["SoilMoi0_10cm_inst"][0])
+    som_2_a = np.asarray(gldas_daily_mean["SoilMoi10_40cm_inst"][0])
+    som_3_a = np.asarray(gldas_daily_mean["SoilMoi40_100cm_inst"][0])
+    som_4_a = np.asarray(gldas_daily_mean["SoilMoi100_200cm_inst"][0])
     som_b = som_1_b + som_2_b + som_3_b + som_4_b
-    # soil moisture after the flood
-    som_1_a = np.loadtxt("../input/2021-07-28/SoilMoi0_10cm_inst.csv", delimiter=",")
-    som_2_a = np.loadtxt("../input/2021-07-28/SoilMoi10_40cm_inst.csv", delimiter=",")
-    som_3_a = np.loadtxt("../input/2021-07-28/SoilMoi40_100cm_inst.csv", delimiter=",")
-    som_4_a = np.loadtxt("../input/2021-07-28/SoilMoi100_200cm_inst.csv", delimiter=",")
     som_a = som_1_a + som_2_a + som_3_a + som_4_a
     # difference
     som_diff = som_a - som_b
+    np.savetxt(f"../input/soilMoisture/{this.strftime('%Y%m%d')}.csv", np.flip(som_diff, axis=0))
+    som_diff[np.isclose(som_diff, 0)] = np.nan
 
-    return Lat, Lon, som_diff
+    return lat, lon, som_diff
 
 
-def compute_lgd_from_gldas(layer_1, layer_2, layer_3, layer_4, pods_c, pods_d, los):
-    g = 6.6743 * 10e-11
+def compute_lgd_from_gldas(layer_1, pods_c, pods_d):
+    g = 6.6743e-11
     lgd = np.zeros([pods_d.__len__(), 1])
     for i, (pod_c, pod_d) in enumerate(zip(pods_c, pods_d)):
-        pc = np.tile(pod_c[1: 4], (layer_1.__len__(), 1))
-        pd = np.tile(pod_d[1: 4], (layer_1.__len__(), 1))
-        pc_1 = pc - layer_1[:, 0: 3]
-        pc_2 = pc - layer_2[:, 0: 3]
-        pc_3 = pc - layer_3[:, 0: 3]
-        pc_4 = pc - layer_4[:, 0: 3]
-        pd_1 = pd - layer_1[:, 0: 3]
-        pd_2 = pd - layer_2[:, 0: 3]
-        pd_3 = pd - layer_3[:, 0: 3]
-        pd_4 = pd - layer_4[:, 0: 3]
+        los = (pod_c - pod_d) / np.linalg.norm(pod_c - pod_d)
+        pc = np.tile(pod_c, (layer_1.__len__(), 1))
+        pd = np.tile(pod_d, (layer_1.__len__(), 1))
+        pc_1 = -pc + layer_1[:, 0: 3]
+        pd_1 = -pd + layer_1[:, 0: 3]
         dc_1 = np.linalg.norm(pc_1, axis=1)**3
-        dc_2 = np.linalg.norm(pc_2, axis=1)**3
-        dc_3 = np.linalg.norm(pc_3, axis=1)**3
-        dc_4 = np.linalg.norm(pc_4, axis=1)**3
         dd_1 = np.linalg.norm(pd_1, axis=1)**3
-        dd_2 = np.linalg.norm(pd_2, axis=1)**3
-        dd_3 = np.linalg.norm(pd_3, axis=1)**3
-        dd_4 = np.linalg.norm(pd_4, axis=1)**3
-        f1 = -pc_1 / dc_1[:, None] + pd_1 / dd_1[:, None]
-        f2 = -pc_2 / dc_2[:, None] + pd_2 / dd_2[:, None]
-        f3 = -pc_3 / dc_3[:, None] + pd_3 / dd_3[:, None]
-        f4 = -pc_4 / dc_4[:, None] + pd_4 / dd_4[:, None]
-        lgd[i] = np.dot(g * f1.T @ layer_1[:, 3], los[i, :]) \
-               + np.dot(g * f2.T @ layer_2[:, 3], los[i, :]) \
-               + np.dot(g * f3.T @ layer_3[:, 3], los[i, :]) \
-               + np.dot(g * f4.T @ layer_4[:, 3], los[i, :])
+        f1 = pc_1 / dc_1[:, None] - pd_1 / dd_1[:, None]
+        lgd[i, :] = np.dot(g * f1.T @ layer_1[:, 3], los)
 
     return lgd
-
-    # for j, (l1, l2, l3, l4) in enumerate(zip(layer_1, layer_2, layer_3, layer_4)):
-    #     pc_1 = pod_c[1: 4] - l1[0: 3]
-    #     pc_2 = pod_c[1: 4] - l2[0: 3]
-    #     pc_3 = pod_c[1: 4] - l3[0: 3]
-    #     pc_4 = pod_c[1: 4] - l4[0: 3]
-    #     pd_1 = pod_d[1: 4] - l1[0: 3]
-    #     pd_2 = pod_d[1: 4] - l2[0: 3]
-    #     pd_3 = pod_d[1: 4] - l3[0: 3]
-    #     pd_4 = pod_d[1: 4] - l4[0: 3]
-    #     dc_1 = np.linalg.norm(pc_1)
-    #     dc_2 = np.linalg.norm(pc_2)
-    #     dc_3 = np.linalg.norm(pc_3)
-    #     dc_4 = np.linalg.norm(pc_4)
-    #     dd_1 = np.linalg.norm(pd_1)
-    #     dd_2 = np.linalg.norm(pd_2)
-    #     dd_3 = np.linalg.norm(pd_3)
-    #     dd_4 = np.linalg.norm(pd_4)
-    #     f1[:, j] = pc_1 / dc_1**3 - pd_1 / dd_1**3
-    #     f2[:, j] = pc_2 / dc_2**3 - pd_2 / dd_2**3
-    #     f3[:, j] = pc_3 / dc_3**3 - pd_3 / dd_3**3
-    #     f4[:, j] = pc_4 / dc_4**3 - pd_4 / dd_4**3
 
 
 def check_track_over_area(lat, lon, lon_span, lat_span):
@@ -501,22 +471,85 @@ def check_track_over_area(lat, lon, lon_span, lat_span):
     return flag
 
 
+def get_soil_moisture_inc(former, latter):
+    # cm = plt.cm.get_cmap("jet")
+    # fig = plt.figure()
+    # ax = fig.add_subplot(projection='3d')
+    # ax.scatter3D(former[:, 0], former[:, 1], former[:, 2], c=latter[:, 3] - former[:, 3], cmap=cm)
+    # plt.show()
+    return np.c_[former[:, 0], former[:, 1], former[:, 2], latter[:, 3] - former[:, 3]]
+
+
+def test_compute_lgd_from_gldas():
+    layer_1 = np.asarray([[5690954.73548881, 1887614.40476405, -2167696.78782876, -1e13],
+                          [6030932.53377883, 2000380.54316791, 552183.960027770, 0]])
+    layer_2 = np.asarray([[6030932.53377883, 2000380.54316791, 552183.960027770, 1e13],
+                          [5690954.73548881, 1887614.40476405, -2167696.78782876, 0]])
+    layer_3 = np.asarray([[5690954.73548881, 1887614.40476405, -2167696.78782876, 0],
+                          [5690954.73548881, 1887614.40476405, -2167696.78782876, 0]])
+    layer_4 = np.asarray([[5690954.73548881, 1887614.40476405, -2167696.78782876, 0],
+                          [5690954.73548881, 1887614.40476405, -2167696.78782876, 0]])
+    layer_1 = np.asarray([[5690954.73548881, 1887614.40476405, -2167696.78782876, -1e13]])
+    layer_2 = np.asarray([[6030932.53377883, 2000380.54316791, 552183.960027770, 1e13]])
+    layer_3 = np.asarray([[5690954.73548881, 1887614.40476405, -2167696.78782876, 0]])
+    layer_4 = np.asarray([[5690954.73548881, 1887614.40476405, -2167696.78782876, 0]])
+    pods_c = np.asarray([[51037.0457498298, -109891.680341260, 6866882.88553822],
+                         [928092.968583422, 286779.601088582, 6797535.14659767]])
+    pods_d = np.asarray([[-107369.501523251, -183036.678970537, 6864808.56978168],
+                         [770474.880408174, 215343.989246805, 6819942.00250571]])
+    print(compute_lgd_from_gldas(layer_1, pods_c, pods_d))
+
+
+def timer(func):
+    def call_func(*args, **kwargs):
+        begin_time = time.time()
+        ret = func(*args, **kwargs)
+        end_time = time.time()
+        run_time = end_time - begin_time
+        print(str(func.__name__) + "函数运行时间为" + str(run_time))
+        return ret
+    return call_func
+
+
+def get_monthly_mean(year, month, flag):
+    main_dir = "D:/Downloads/MERRA2/"
+    # get constants
+    this_month = f"{main_dir}{year}-{month:02}/"
+
+    # find all the data in this month
+    filenames = os.listdir(this_month)
+    res = np.zeros([361, 576])
+    for _, filename in enumerate(filenames):
+        this_day = np.asarray(nc.Dataset(f"{this_month}{filename}")[flag])
+        mean = np.zeros(this_day[0, :, :].shape)
+        for id in np.arange(24):
+            mean = mean + this_day[id, :, :] / 24.0
+        res = res + mean / filenames.__len__()
+
+    return res
+
+
+@timer
 def main():
     # date array
-    start_date = datetime.date(2021, 7, 22)
-    end_date = datetime.date(2021, 7, 23)
+    start_date = datetime.date(2021, 7, 2)
+    end_date = datetime.date(2021, 7, 26)
     dates4lgd = [start_date + datetime.timedelta(n) for n in range(int((end_date - start_date).days))]
     # background model used
     background = "background202106"
+    # hydro model
+    hydro_model = "MERRA2"
     # research area
     lat_span = [31, 36.5]
     lon_span = [110, 118.5]
-    lat_span_gldas = [-60, 90]
+    lat_span_gldas = [-90, 90]
     lon_span_gldas = [-180, 180]
-    # get the soil moisture
-    lat, lon, som_diff = get_soil_moisture_diff()
+    # lat_span = [20, 28]
+    # lon_span = [90, 97]
+    # lat_span_gldas = [0, 60]
+    # lon_span_gldas = [80, 110]
     # the soil moisture of the monthly mean GLDAS
-    layer_1, layer_2, layer_3, layer_4 = get_soil_moisture(background, lat_span_gldas, lon_span_gldas)
+    som_m = get_soil_moisture(background, lat_span_gldas, lon_span_gldas, "monthly", hydro_model)
     # coefficients
     fs_lri = 0.5
     fs_kbr = 0.2
@@ -525,14 +558,6 @@ def main():
         kbr_x, pod_c, pod_d, gnv_c, gnv_d, lri_x, grd, sst = load_data(date4lgd, background)
         tracks_lri = divide_track(grd[::2, 1])
         tracks_kbr = divide_track(grd[::5, 1])
-        tracks_gld = divide_track(grd[::10, 1])
-
-        pos_rela = pod_c[:, 1: 4] - pod_d[:, 1: 4]
-        dis = np.zeros([pos_rela.__len__(), 1])
-        los = np.zeros([pos_rela.__len__(), 3])
-        for index, e in enumerate(pos_rela):
-            dis[index] = np.linalg.norm(e)
-            los[index, :] = pos_rela[index, :] / dis[index]
 
         sst_kbr = antialias_filter(5, sst[:, 2], "kbr")
         sst_lri = antialias_filter(2, sst[:, 2], "lri")
@@ -542,61 +567,68 @@ def main():
         lgd_lri = rr2lgd(rr_lri, fs_lri, "lri")
         lgd_kbr = rr2lgd(rr_kbr, fs_kbr, "kbr")
 
-        for ind, (span_lri, span_kbr, span_gld) in enumerate(zip(tracks_lri, tracks_kbr, tracks_gld)):
+        for ind, (span_lri, span_kbr) in enumerate(zip(tracks_lri, tracks_kbr)):
             over_area = check_track_over_area(grd[::2][span_lri[0]: span_lri[1], 1], grd[::2][span_lri[0]: span_lri[1], 0],
                                               lon_span, lat_span)
             if not over_area:
                 continue
+            else:
+                # get the soil moisture of this day
+                som_d = get_soil_moisture(date4lgd, lat_span_gldas, lon_span_gldas, "daily", hydro_model)
+                lgd_gldas = compute_lgd_from_gldas(get_soil_moisture_inc(som_m, som_d),
+                                                   gnv_c[span_lri[0]: span_lri[1], :],
+                                                   gnv_d[span_lri[0]: span_lri[1], :])
+
             # plot
-            fig, ax = plt.subplots(2, 1, figsize=(16, 8))
-            ax[1].plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_lri[span_lri[0]: span_lri[1]], label=f"LRI-{ind}",
-                       linewidth=2, color="blue")
-            ax[1].plot(grd[::5][span_kbr[0]: span_kbr[1], 1], lgd_kbr[span_kbr[0]: span_kbr[1]], label=f"KBR-{ind}",
-                       linewidth=2, color="green")
-            if over_area:
-                lgd_gldas = compute_lgd_from_gldas(layer_1, layer_2, layer_3, layer_4,
-                                                   pod_c[::10][span_gld[0]: span_gld[1], :],
-                                                   pod_d[::10][span_gld[0]: span_gld[1], :],
-                                                   los[::10][span_gld[0]: span_gld[1], :])
-                ax[1].plot(grd[::10][span_gld[0]: span_gld[1], 1], lgd_gldas, label=f"GLDAS-{ind}",
-                           linewidth=2, color="red")
-            ax[1].tick_params(labelsize=25, width=2.9)
-            ax[1].yaxis.get_offset_text().set_fontsize(24)
-            ax[1].legend(fontsize=15, loc='best', frameon=False)
-            ax[1].set_ylabel(r'LGD [m/s$^2$]', fontsize=20)
-            ax[1].set_xlabel('Lat [°]', fontsize=20)
-            ax[1].set_ylim([-3e-9, 3e-9])
-            ax[1].axvspan(lat_span[0], lat_span[1], alpha=0.5, color='red')
-            ax[1].grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
-            plt.setp(ax[1].spines.values(), linewidth=3)
-            plt.setp(ax[0].spines.values(), linewidth=3)
+            fig, ax = plt.subplots(2, 2, figsize=(12, 8),
+                                   gridspec_kw={'width_ratios': [40, 1], "height_ratios": [1, 1]})
+            ax[1, 0].plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_lri[span_lri[0]: span_lri[1]],
+                          label=f"LRI", linewidth=2, color="blue")
+            ax[1, 0].plot(grd[::5][span_kbr[0]: span_kbr[1], 1], lgd_kbr[span_kbr[0]: span_kbr[1]],
+                          label=f"KBR", linewidth=2, color="green")
+            ax[1, 0].plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_gldas,
+                          label=f"GLDAS", linewidth=2, color="red")
+            # # get data from first line of the plot
+            # newx = ax[1].lines[1].get_ydata()
+            # newy = ax[1].lines[1].get_xdata()
+            # # set new x- and y- data for the line
+            # ax[1].lines[1].set_xdata(newx)
+            # ax[1].lines[1].set_ydata(newy)
+            ax[1, 0].set_ylim([-5e-9, 5e-9])
+            ax[1, 0].yaxis.get_offset_text().set_fontsize(24)
+            ax[1, 0].axvspan(lat_span[0], lat_span[1], alpha=0.5, color='red')
+            ax[1, 0].tick_params(labelsize=25, width=2.9)
+            ax[1, 0].legend(fontsize=15, loc='best', frameon=False)
+            ax[1, 0].set_ylabel('LGD [m/s$^2$]', fontsize=20)
+            ax[1, 0].set_xlabel('Lat. [deg]', fontsize=20)
+            ax[1, 0].grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+            plt.setp(ax[1, 0].spines.values(), linewidth=3)
+            plt.setp(ax[0, 0].spines.values(), linewidth=3)
 
-            ax[0].set_title(f"{date4lgd}-{ind}", fontsize=24)
+            ax[0, 0].set_title(f"{date4lgd}-{ind}", fontsize=24)
             cm = plt.cm.get_cmap("jet")
-            ax[0].pcolormesh(lon, lat, som_diff.T, cmap=cm)
-            ax[0].plot(grd[::2][span_lri[0]: span_lri[1], 0], grd[::2][span_lri[0]: span_lri[1], 1], color="purple", linewidth=2)
-            ax[0].tick_params(labelsize=25, width=2.9)
-            ax[0].yaxis.get_offset_text().set_fontsize(24)
-            ax[0].add_patch(Rectangle((lon_span[0], lat_span[0]),
-                                      lon_span[1] - lon_span[0],
-                                      lat_span[1] - lat_span[0],
-                                      fill=None, alpha=1))
-            ax[0].set_ylabel(r'Latitude [$\degree$]', fontsize=20)
-            ax[0].set_xlabel(r'Longitude [$\degree$]', fontsize=20)
-            ax[0].scatter(113.68, 34.75, color="k", marker="*")
-            ax[0].axis('equal')
-            ax[0].grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
-            ax[0].set_ylim([30, 40])
-            if over_area:
-                ax[0].add_patch(Rectangle((lon_span_gldas[0], lat_span_gldas[0]),
-                                          lon_span_gldas[1] - lon_span_gldas[0],
-                                          lat_span_gldas[1] - lat_span_gldas[0],
-                                          fill=None, alpha=1, linestyle="dashed"))
-                plt.show()
-                exit()
-
+            # get the soil moisture
+            lat, lon, som_diff = get_soil_moisture_diff(background, date4lgd)
+            im = ax[0, 0].pcolormesh(lon, lat, som_diff.T, cmap=cm)
+            ax[0, 0].plot(grd[::2][span_lri[0]: span_lri[1], 0], grd[::2][span_lri[0]: span_lri[1], 1], color="purple", linewidth=2)
+            ax[0, 0].tick_params(labelsize=25, width=2.9)
+            ax[0, 0].yaxis.get_offset_text().set_fontsize(24)
+            ax[0, 0].add_patch(Rectangle((lon_span[0], lat_span[0]),
+                                         lon_span[1] - lon_span[0],
+                                         lat_span[1] - lat_span[0],
+                                         fill=None, alpha=1))
+            ax[0, 0].set_ylabel('Lat. [deg]', fontsize=20)
+            ax[0, 0].set_xlabel('Lon. [deg]', fontsize=20)
+            ax[0, 0].scatter(113.68, 34.75, color="k", marker="*")
+            ax[0, 0].axis('equal')
+            ax[0, 0].grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+            cbar = fig.colorbar(im, cax=ax[0, 1])
+            cbar.ax.tick_params(labelsize=10)
+            cbar.ax.set_title('EWH [mm]', fontsize=15)
+            ax[0, 0].set_ylim([20, 60])
+            ax[1, 1].axis("off")
             plt.tight_layout()
-            plt.savefig(f"../image/{background}/lgd_{date4lgd}_{ind}.png", dpi=600)
+            plt.savefig(f"../image/{background}/lgd_{date4lgd}_{ind}_{hydro_model}.png", dpi=600)
 
         # ASD of LGD
         x_lri, f_lri, c_lri = lpsd(lgd_lri, windows.nuttall, 1e-4, 2e-1, 400, 100, 2, fs_lri, 0.5)
@@ -622,7 +654,8 @@ def main():
         ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
         plt.setp(ax.spines.values(), linewidth=3)
         plt.tight_layout()
-        plt.savefig(f"../image/{background}/lgd_{date4lgd}_ASD.png", dpi=600)
+        # plt.savefig(f"../image/{background}/lgd_{date4lgd}_ASD.png", dpi=600)
+        # plt.show()
 
 
 if __name__ == "__main__":
@@ -630,3 +663,4 @@ if __name__ == "__main__":
     plt.rcParams["axes.unicode_minus"] = False
 
     main()
+    # test_compute_lgd_from_gldas()
