@@ -190,7 +190,7 @@ def absoluteFilePaths(directory):
 
 
 def check_discharge():
-    coors_stations = np.asarray([[113.39, 34.5], [112.24, 34.5], [116.18, 34.5]])
+    coors_stations = np.asarray([[112.24, 34.5], [116.18, 34.5]])
     y = np.loadtxt("../input/yellow_river_subregion.txt")
     p = path.Path(y)
     num = 8 * 61
@@ -201,9 +201,9 @@ def check_discharge():
     filenames_measured = os.listdir("D:/Downloads/dailyReportYellowRiver")
     for id, _ in enumerate(discharges_measured):
         tmp = np.asarray(pd.read_excel(f"D:/Downloads/dailyReportYellowRiver/{filenames_measured[id]}"))
-        discharges_measured[id, 0] = tmp[43, 4]
-        discharges_measured[id, 1] = tmp[29, 4]
-        discharges_measured[id, 2] = tmp[50, 4]
+        # discharges_measured[id, 0] = tmp[43, 4]
+        discharges_measured[id, 0] = tmp[29, 4]
+        discharges_measured[id, 1] = tmp[50, 4]
 
     # soil moisture in kg*m^-2
     lat_a = np.loadtxt("../input/2020-07-02/lat.csv", delimiter=",")
@@ -211,8 +211,10 @@ def check_discharge():
 
     filenames = absoluteFilePaths("D:/Downloads/GLDAS/three_hours")[0: num]
 
-    runoff = np.zeros(([num, coors_stations.shape[0]]))
+    runoff = np.zeros([num, coors_stations.shape[0]])
+    precip = np.zeros([num, coors_stations.shape[0]])
     is_in_polygon = np.zeros([coors_stations.shape[0], lat_a.__len__(), lon_a.__len__()])
+
     for id_lat, lat in enumerate(lat_a):
         for id_lon, lon in enumerate(lon_a):
             for id_sta, coor_station in enumerate(coors_stations):
@@ -221,12 +223,38 @@ def check_discharge():
 
     for id_sta, coor_station in enumerate(coors_stations):
         for id_monthly, filename in enumerate(filenames):
+            # if id_monthly > 408:
+            #     continue
             gldas = nc.Dataset(filename)
-            sur = np.asarray(gldas["Qs_acc"][0]) * is_in_polygon[id_sta, :, :] * areas / 1000
+            sur = np.asarray(gldas["Qs_acc"][0])
+            sub = np.asarray(gldas["Qsb_acc"][0])
+            pre = np.asarray(gldas["Rainf_f_tavg"][0])
+            sur[sur == -9999] = 0
+            sub[sub == -9999] = 0
+            pre[pre == -9999] = 0
+            sur = (sur + sub) * is_in_polygon[id_sta, :, :] * areas / 1000 / (3 * 60 * 60)
+            pre = pre * is_in_polygon[id_sta, :, :] * areas / 1000
             runoff[id_monthly, id_sta] = np.sum(sur)
+            precip[id_monthly, id_sta] = np.sum(pre)
 
     fig, ax = plt.subplots(figsize=(12, 8))
-    ax.plot(np.linspace(6, 8, num), runoff[:, 0], label="GLDAS_runoff", linewidth=2, marker="o")
+    cm = plt.cm.get_cmap("jet")
+    lat, lon = np.meshgrid(lat_a, lon_a)
+    im = ax.pcolormesh(lon, lat, np.log10(pre.T), cmap=cm)
+    ax.plot(y[:, 0], y[:, 1])
+    ax.axis("equal")
+    cbar = fig.colorbar(im)
+    cbar.ax.set_title('', fontsize=15)
+    plt.show()
+
+    runoff = np.add.reduceat(runoff, np.arange(0, len(runoff), 8)) / 8
+    precip = np.add.reduceat(precip, np.arange(0, len(precip), 8)) / 8
+    np.savetxt("../output/GLDAS_discharge.txt", runoff)
+    np.savetxt("../output/GLDAS_precipitation.txt", precip)
+
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.plot(np.linspace(6, 8, runoff.__len__()), runoff[:, 0], label="GLDAS_runoff", linewidth=2, marker="o")
+    ax.plot(np.linspace(6, 8, runoff.__len__()), precip[:, 0], label="GLDAS_precipitation", linewidth=2, marker="o")
     ax.plot(np.linspace(6, 8, discharges_measured.__len__()), discharges_measured[:, 0], label="measured_discharge", linewidth=2, marker="o")
     ax.yaxis.get_offset_text().set_fontsize(24)
     ax.tick_params(labelsize=25, width=2.9)

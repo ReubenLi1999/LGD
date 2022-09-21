@@ -1,17 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.signal import welch, butter, filtfilt, windows, kaiserord, firwin
+from scipy.signal import filtfilt, windows, kaiserord, firwin
 from scipy.fftpack import rfft, irfft, fftfreq
-from pyproj import Geod
 import astropy.coordinates as ac
 from astropy import units as u
 from astropy.time import Time
 from scipy.sparse.linalg import lsqr
-from matplotlib.patches import Rectangle
 import datetime
 import netCDF4 as nc
 import time
 import os
+import cartopy.crs as ccrs
+import matplotlib.gridspec as gridspec
+import itertools
+import matplotlib.patheffects as pe
 
 
 def nan_helper(y):
@@ -245,7 +247,59 @@ def lgd2mass(source_locations, coor_c, coor_d, los, lgd, lat, flag):
     return np.sum(m)
 
 
-def get_soil_moisture(background, lat_span, lon_span, resolution, flag):
+def get_soil_moisture(background, resolution, flag):
+    if flag == "GLDAS":
+        # monthly mean GLDAS dataset
+        if resolution == "monthly":
+            gldas_monthly_mean = nc.Dataset(f"D:/Downloads/GLDAS/monthly/GLDAS_NOAH025_M.A{background[-6:]}.021.nc4")
+        elif resolution == "daily":
+            gldas_monthly_mean = nc.Dataset(f"D:/Downloads/GLDAS/three_hours/GLDAS_NOAH025_3H.A{background.strftime('%Y%m%d')}.0600.021.nc4")
+        else:
+            gldas_monthly_mean = []
+
+        # load coordinates
+        x = np.loadtxt("../input/x_GLDAS_0.25x0.25_3.txt")
+        y = np.loadtxt("../input/y_GLDAS_0.25x0.25_3.txt")
+        z = np.loadtxt("../input/z_GLDAS_0.25x0.25_3.txt")
+
+        som_1 = np.asarray(gldas_monthly_mean["SoilMoi0_10cm_inst"][0])
+        som_2 = np.asarray(gldas_monthly_mean["SoilMoi10_40cm_inst"][0])
+        som_3 = np.asarray(gldas_monthly_mean["SoilMoi40_100cm_inst"][0])
+        som_4 = np.asarray(gldas_monthly_mean["SoilMoi100_200cm_inst"][0])
+        som = som_1 + som_2 + som_3 + som_4
+        area = np.loadtxt("../input/areas_GLDAS.txt")
+    else:
+        main_dir = "D:/Downloads/MERRA2/"
+        # get constants
+        cons = nc.Dataset(f"{main_dir}MERRA2_100.const_2d_lnd_Nx.00000000.nc4")
+        # monthly mean GLDAS dataset
+        if resolution == "monthly":
+            gldas_monthly_mean = get_monthly_mean(int(background[-6:-2]), int(background[-2:]), "PRMC")
+        elif resolution == "daily":
+            gldas_monthly_mean = np.asarray(nc.Dataset(F"d:/Downloads/MERRA2/{background.strftime('%Y-%m')}/MERRA2_401.tavg1_2d_lnd_Nx.{background.strftime('%Y%m%d')}.nc4")["PRMC"][:, :, :])
+            gldas_monthly_mean = np.sum(gldas_monthly_mean, axis=0) / 24
+        else:
+            gldas_monthly_mean = []
+
+        # load coordinates
+        x = np.loadtxt("../output/merra2_pr_x.txt")
+        y = np.loadtxt("../output/merra2_pr_y.txt")
+        z = np.loadtxt("../output/merra2_pr_z.txt")
+
+        som = np.asarray(gldas_monthly_mean * np.asarray(cons["dzpr"][0, :, :]) * 1000)
+        area = np.loadtxt("../input/areas_MERRA2.txt")
+
+    area = area[np.logical_and(som > -500, som < 50000)]
+    x = x[np.logical_and(som > -500, som < 50000)]
+    y = y[np.logical_and(som > -500, som < 50000)]
+    z = z[np.logical_and(som > -500, som < 50000)]
+    som = som[np.logical_and(som > -500, som < 50000)]
+    res = np.c_[x.flatten(), y.flatten(), z.flatten(), som.flatten() * area.flatten()]
+
+    return np.asarray(res)
+
+
+def get_precipitation(background, resolution, flag):
     if flag == "GLDAS":
         # monthly mean GLDAS dataset
         if resolution == "monthly":
@@ -263,55 +317,32 @@ def get_soil_moisture(background, lat_span, lon_span, resolution, flag):
         # soil moisture in kg*m^-2
         lat_a = np.loadtxt("../input/2020-07-02/lat.csv", delimiter=",")
         lon_a = np.loadtxt("../input/2020-07-02/lon.csv", delimiter=",")
+        lat, lon = np.meshgrid(lat_a, lon_a)
 
         som_1 = np.asarray(gldas_monthly_mean["SoilMoi0_10cm_inst"][0])
         som_2 = np.asarray(gldas_monthly_mean["SoilMoi10_40cm_inst"][0])
         som_3 = np.asarray(gldas_monthly_mean["SoilMoi40_100cm_inst"][0])
         som_4 = np.asarray(gldas_monthly_mean["SoilMoi100_200cm_inst"][0])
         som = som_1 + som_2 + som_3 + som_4
+        area = np.loadtxt("../input/areas_GLDAS.txt")
     else:
-        main_dir = "D:/Downloads/MERRA2/"
-        # get constants
-        cons = nc.Dataset(f"{main_dir}MERRA2_100.const_2d_lnd_Nx.00000000.nc4")
         # monthly mean GLDAS dataset
         if resolution == "monthly":
             gldas_monthly_mean = get_monthly_mean(2021, 6, "PRMC")
         elif resolution == "daily":
-            gldas_monthly_mean = np.asarray(nc.Dataset(F"d:/Downloads/MERRA2/2021-07/MERRA2_401.tavg1_2d_lnd_Nx.{background.strftime('%Y%m%d')}.nc4")["PRMC"][0, :, :])
+            gldas_monthly_mean = np.asarray(nc.Dataset(F"d:/Downloads/MERRA2/2021-07/MERRA2_401.tavg1_2d_lnd_Nx.{background.strftime('%Y%m%d')}.nc4")["PRECTOTLAND"][:, :, :])
         else:
             gldas_monthly_mean = []
 
-        # load coordinates
-        x = np.loadtxt("../output/merra2_pr_x.txt")
-        y = np.loadtxt("../output/merra2_pr_y.txt")
-        z = np.loadtxt("../output/merra2_pr_z.txt")
+        lat = np.arange(-90., 90.5, 0.5)
+        lon = np.arange(-180., 180., 0.625)
+        lat, lon = np.meshgrid(lat, lon)
 
-        # soil moisture in kg*m^-2
-        lat_a = np.arange(-90., 90.5, 0.5)
-        lon_a = np.arange(-180., 180., 0.625)
+        gldas_monthly_mean = np.sum(gldas_monthly_mean, axis=0) / 24
+        gldas_monthly_mean[np.isclose(gldas_monthly_mean, 9.9999999E14)] = np.nan
+        som = gldas_monthly_mean * 1000
 
-        som = gldas_monthly_mean * np.asarray(cons["dzpr"][0, :, :]) * 1000
-
-    # define wgs84 as crs
-    geod = Geod('+a=6378137 +f=0.0033528106647475126')
-    # area for each segment
-    res = []
-    for id_lat, lat in enumerate(lat_a):
-        for id_lon, lon in enumerate(lon_a):
-            if np.logical_and(np.logical_and(lat >= lat_span[0], lat <= lat_span[1]),
-                              np.logical_and(lon >= lon_span[0], lon <= lon_span[1])):
-                if np.logical_and(som[id_lat, id_lon] > -500.0, som[id_lat, id_lon] < 50000.0):
-
-                    lat_small = lat - (lat_a[2] - lat_a[1]) / 2
-                    lat_large = lat + (lat_a[2] - lat_a[1]) / 2
-                    lon_small = lon - (lon_a[2] - lon_a[1]) / 2
-                    lon_large = lon + (lon_a[2] - lon_a[1]) / 2
-
-                    area, _ = geod.polygon_area_perimeter([lon_large, lon_large, lon_small, lon_small],
-                                                          [lat_large, lat_small, lat_small, lat_large])
-                    res.append([x[id_lat, id_lon], y[id_lat, id_lon], z[id_lat, id_lon], abs(area) * som[id_lat, id_lon]])
-
-    return np.asarray(res)
+    return lat, lon, som
 
 
 def antialias_filter(interval, sig, flag):
@@ -323,6 +354,48 @@ def antialias_filter(interval, sig, flag):
     cut = filtfilt(coeff, 1, sig)
 
     return cut[::interval]
+
+
+def add_zebra_frame(ax, lw=2, crs="pcarree", zorder=None):
+
+    ax.spines["geo"].set_visible(False)
+    left, right, bot, top = ax.get_extent()
+
+    # Alternate black and white line segments
+    bws = itertools.cycle(["k", "white"])
+
+    xticks = sorted([left, *ax.get_xticks(), right])
+    xticks = np.unique(np.array(xticks))
+    yticks = sorted([bot, *ax.get_yticks(), top])
+    yticks = np.unique(np.array(yticks))
+    for ticks, which in zip([xticks, yticks], ["lon", "lat"]):
+        for idx, (start, end) in enumerate(zip(ticks, ticks[1:])):
+            bw = next(bws)
+            if which == "lon":
+                xs = [[start, end], [start, end]]
+                ys = [[bot, bot], [top, top]]
+            else:
+                xs = [[left, left], [right, right]]
+                ys = [[start, end], [start, end]]
+
+            # For first and lastlines, used the "projecting" effect
+            capstyle = "butt" if idx not in (0, len(ticks) - 2) else "projecting"
+            for (xx, yy) in zip(xs, ys):
+                ax.plot(
+                    xx,
+                    yy,
+                    color=bw,
+                    linewidth=lw,
+                    clip_on=False,
+                    transform=crs,
+                    zorder=zorder,
+                    solid_capstyle=capstyle,
+                    # Add a black border to accentuate white segments
+                    path_effects=[
+                        pe.Stroke(linewidth=lw + 1, foreground="black"),
+                        pe.Normal(),
+                    ],
+                )
 
 
 def divide_track(lat):
@@ -339,8 +412,8 @@ def divide_track(lat):
 
     res = np.zeros([ind.__len__()-1, 2], dtype=int)
     for id in np.arange(0, ind.__len__()-1, 1):
-        res[id, 0] = ind[id]
-        res[id, 1] = ind[id+1]
+        res[id, 0] = ind[id] + 1
+        res[id, 1] = ind[id+1] - 1
 
     return res
 
@@ -372,16 +445,16 @@ def load_data(date4lgd, back):
         pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL202107.txt",
                            skiprows=6)
     elif back == "background202106":
-        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL.txt", skiprows=6)
-        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL.txt",
+        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL202106.txt", skiprows=6)
+        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL202106.txt",
                            skiprows=6)
-        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL.txt",
+        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL202106.txt",
                            skiprows=6)
     elif back == "background202005":
-        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL.txt", skiprows=6)
-        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL.txt",
+        sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_JPL*", skiprows=6)
+        pod_c = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-c_integratedOrbitFit_{date4lgd}_JPL*",
                            skiprows=6)
-        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL.txt",
+        pod_d = np.loadtxt(f"E:\lhsPrograms\Projects_2022\LGD\output\grace-d_integratedOrbitFit_{date4lgd}_JPL*",
                            skiprows=6)
     else:
         sst = np.loadtxt(f"../output/grace-fo_satelliteTracking_{date4lgd}_GOCO06.txt", skiprows=6)
@@ -462,8 +535,8 @@ def compute_lgd_from_gldas(layer_1, pods_c, pods_d):
 def check_track_over_area(lat, lon, lon_span, lat_span):
     flag = False
     try:
-        if np.logical_and(np.mean(lon[np.where(np.logical_and(lat >= lat_span[0], lat <= lat_span[1]))]) <= (lon_span[1] + 2),
-                          np.mean(lon[np.where(np.logical_and(lat >= lat_span[0], lat <= lat_span[1]))]) >= (lon_span[0] - 2)):
+        if np.logical_and(np.mean(lon[np.where(np.logical_and(lat >= lat_span[0], lat <= lat_span[1]))]) <= (lon_span[1]),
+                          np.mean(lon[np.where(np.logical_and(lat >= lat_span[0], lat <= lat_span[1]))]) >= (lon_span[0])):
             flag = True
     except:
         pass
@@ -472,11 +545,6 @@ def check_track_over_area(lat, lon, lon_span, lat_span):
 
 
 def get_soil_moisture_inc(former, latter):
-    # cm = plt.cm.get_cmap("jet")
-    # fig = plt.figure()
-    # ax = fig.add_subplot(projection='3d')
-    # ax.scatter3D(former[:, 0], former[:, 1], former[:, 2], c=latter[:, 3] - former[:, 3], cmap=cm)
-    # plt.show()
     return np.c_[former[:, 0], former[:, 1], former[:, 2], latter[:, 3] - former[:, 3]]
 
 
@@ -521,9 +589,7 @@ def get_monthly_mean(year, month, flag):
     res = np.zeros([361, 576])
     for _, filename in enumerate(filenames):
         this_day = np.asarray(nc.Dataset(f"{this_month}{filename}")[flag])
-        mean = np.zeros(this_day[0, :, :].shape)
-        for id in np.arange(24):
-            mean = mean + this_day[id, :, :] / 24.0
+        mean = np.sum(this_day, axis=0) / 24
         res = res + mean / filenames.__len__()
 
     return res
@@ -532,24 +598,25 @@ def get_monthly_mean(year, month, flag):
 @timer
 def main():
     # date array
-    start_date = datetime.date(2021, 7, 2)
-    end_date = datetime.date(2021, 7, 26)
-    dates4lgd = [start_date + datetime.timedelta(n) for n in range(int((end_date - start_date).days))]
+    sta_date = datetime.date(2021, 8, 21)
+    end_date = datetime.date(2021, 8, 30)
+    dates4lgd = [sta_date + datetime.timedelta(n) for n in range(int((end_date - sta_date).days))]
     # background model used
     background = "background202106"
     # hydro model
     hydro_model = "MERRA2"
+    hydro_model_alter = "GLDAS"
     # research area
+    area = "europe"
     lat_span = [31, 36.5]
-    lon_span = [110, 118.5]
-    lat_span_gldas = [-90, 90]
-    lon_span_gldas = [-180, 180]
-    # lat_span = [20, 28]
-    # lon_span = [90, 97]
+    lon_span = [112, 118]
+    lat_span = [45, 54]
+    lon_span = [2, 17]
     # lat_span_gldas = [0, 60]
     # lon_span_gldas = [80, 110]
     # the soil moisture of the monthly mean GLDAS
-    som_m = get_soil_moisture(background, lat_span_gldas, lon_span_gldas, "monthly", hydro_model)
+    som_m = get_soil_moisture(background, "monthly", hydro_model)
+    som_m_alter = get_soil_moisture(background, "monthly", hydro_model_alter)
     # coefficients
     fs_lri = 0.5
     fs_kbr = 0.2
@@ -562,8 +629,8 @@ def main():
         sst_kbr = antialias_filter(5, sst[:, 2], "kbr")
         sst_lri = antialias_filter(2, sst[:, 2], "lri")
 
-        rr_lri = lri_x[:, 2] + lri_x[:, 6] - sst_lri
-        rr_kbr = kbr_x[:, 2] + kbr_x[:, 6] + kbr_x[:1, 9] - sst_kbr
+        rr_lri = lri_x[:, 2] - sst_lri + lri_x[:, 6]
+        rr_kbr = kbr_x[:, 2] - sst_kbr + kbr_x[:, 6] + kbr_x[:1, 9]
         lgd_lri = rr2lgd(rr_lri, fs_lri, "lri")
         lgd_kbr = rr2lgd(rr_kbr, fs_kbr, "kbr")
 
@@ -572,93 +639,115 @@ def main():
                                               lon_span, lat_span)
             if not over_area:
                 continue
-            else:
-                # get the soil moisture of this day
-                som_d = get_soil_moisture(date4lgd, lat_span_gldas, lon_span_gldas, "daily", hydro_model)
-                lgd_gldas = compute_lgd_from_gldas(get_soil_moisture_inc(som_m, som_d),
-                                                   gnv_c[span_lri[0]: span_lri[1], :],
-                                                   gnv_d[span_lri[0]: span_lri[1], :])
+            # get the soil moisture of this day
+            som_d = get_soil_moisture(date4lgd, "daily", hydro_model)
+            som_d_alter = get_soil_moisture(date4lgd, "daily", hydro_model_alter)
+            lgd_gldas = compute_lgd_from_gldas(get_soil_moisture_inc(som_m, som_d),
+                                               gnv_c[span_lri[0]: span_lri[1], :],
+                                               gnv_d[span_lri[0]: span_lri[1], :])
+            lgd_alter = compute_lgd_from_gldas(get_soil_moisture_inc(som_m_alter, som_d_alter),
+                                               gnv_c[span_lri[0]: span_lri[1], :],
+                                               gnv_d[span_lri[0]: span_lri[1], :])
 
-            # plot
-            fig, ax = plt.subplots(2, 2, figsize=(12, 8),
-                                   gridspec_kw={'width_ratios': [40, 1], "height_ratios": [1, 1]})
-            ax[1, 0].plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_lri[span_lri[0]: span_lri[1]],
-                          label=f"LRI", linewidth=2, color="blue")
-            ax[1, 0].plot(grd[::5][span_kbr[0]: span_kbr[1], 1], lgd_kbr[span_kbr[0]: span_kbr[1]],
-                          label=f"KBR", linewidth=2, color="green")
-            ax[1, 0].plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_gldas,
-                          label=f"GLDAS", linewidth=2, color="red")
-            # # get data from first line of the plot
-            # newx = ax[1].lines[1].get_ydata()
-            # newy = ax[1].lines[1].get_xdata()
-            # # set new x- and y- data for the line
-            # ax[1].lines[1].set_xdata(newx)
-            # ax[1].lines[1].set_ydata(newy)
-            ax[1, 0].set_ylim([-5e-9, 5e-9])
-            ax[1, 0].yaxis.get_offset_text().set_fontsize(24)
-            ax[1, 0].axvspan(lat_span[0], lat_span[1], alpha=0.5, color='red')
-            ax[1, 0].tick_params(labelsize=25, width=2.9)
-            ax[1, 0].legend(fontsize=15, loc='best', frameon=False)
-            ax[1, 0].set_ylabel('LGD [m/s$^2$]', fontsize=20)
-            ax[1, 0].set_xlabel('Lat. [deg]', fontsize=20)
-            ax[1, 0].grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
-            plt.setp(ax[1, 0].spines.values(), linewidth=3)
-            plt.setp(ax[0, 0].spines.values(), linewidth=3)
-
-            ax[0, 0].set_title(f"{date4lgd}-{ind}", fontsize=24)
-            cm = plt.cm.get_cmap("jet")
-            # get the soil moisture
-            lat, lon, som_diff = get_soil_moisture_diff(background, date4lgd)
-            im = ax[0, 0].pcolormesh(lon, lat, som_diff.T, cmap=cm)
-            ax[0, 0].plot(grd[::2][span_lri[0]: span_lri[1], 0], grd[::2][span_lri[0]: span_lri[1], 1], color="purple", linewidth=2)
-            ax[0, 0].tick_params(labelsize=25, width=2.9)
-            ax[0, 0].yaxis.get_offset_text().set_fontsize(24)
-            ax[0, 0].add_patch(Rectangle((lon_span[0], lat_span[0]),
-                                         lon_span[1] - lon_span[0],
-                                         lat_span[1] - lat_span[0],
-                                         fill=None, alpha=1))
-            ax[0, 0].set_ylabel('Lat. [deg]', fontsize=20)
-            ax[0, 0].set_xlabel('Lon. [deg]', fontsize=20)
-            ax[0, 0].scatter(113.68, 34.75, color="k", marker="*")
-            ax[0, 0].axis('equal')
-            ax[0, 0].grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
-            cbar = fig.colorbar(im, cax=ax[0, 1])
-            cbar.ax.tick_params(labelsize=10)
-            cbar.ax.set_title('EWH [mm]', fontsize=15)
-            ax[0, 0].set_ylim([20, 60])
-            ax[1, 1].axis("off")
-            plt.tight_layout()
-            plt.savefig(f"../image/{background}/lgd_{date4lgd}_{ind}_{hydro_model}.png", dpi=600)
+            # fig = plt.figure(figsize=(20, 8))
+            # fig.suptitle(f"{date4lgd}-{ind}", fontsize=24)
+            # gs = gridspec.GridSpec(1, 3,
+            #                        width_ratios=[1, 0.02, 1])
+            # ax1 = plt.subplot(gs[0], projection=ccrs.PlateCarree())
+            # ax2 = plt.subplot(gs[2])
+            # ax3 = plt.subplot(gs[1])
+            # ax2.plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_lri[span_lri[0]: span_lri[1]],
+            #               label=f"LRI", linewidth=2, color="blue")
+            # ax2.plot(grd[::5][span_kbr[0]: span_kbr[1], 1], lgd_kbr[span_kbr[0]: span_kbr[1]],
+            #               label=f"KBR", linewidth=2, color="green")
+            # ax2.plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_gldas,
+            #               label=hydro_model, linewidth=2, color="red")
+            # ax2.plot(grd[::2][span_lri[0]: span_lri[1], 1], lgd_alter,
+            #               label=hydro_model, linewidth=2, color="grey")
+            # for line in ax2.lines:
+            #     # get data from first line of the plot
+            #     new_x = line.get_ydata()
+            #     new_y = line.get_xdata()
+            #     # set new x- and y- data for the line
+            #     line.set_xdata(new_x)
+            #     line.set_ydata(new_y)
+            # ax2.xaxis.get_offset_text().set_fontsize(24)
+            # ax2.axhspan(lat_span[0], lat_span[1], alpha=0.5, color='red')
+            # ax2.tick_params(labelsize=25, width=2.9)
+            # ax2.legend(fontsize=15, loc='best', frameon=False)
+            # ax2.set_xlabel('LGD [m/s$^2$]', fontsize=20)
+            # ax2.set_ylabel('Lat. [deg]', fontsize=20)
+            # ax2.set_xlim([-5e-9, 5e-9])
+            # ax2.set_ylim([0, 60])
+            # ax2.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+            # plt.setp(ax2.spines.values(), linewidth=3)
+            # plt.setp(ax1.spines.values(), linewidth=3)
+            # cm = plt.cm.get_cmap("jet")
+            # lat, lon, som_diff = get_soil_moisture_diff(background, date4lgd)
+            # im = ax1.pcolormesh(lon, lat, som_diff.T, cmap=cm, transform=ccrs.PlateCarree())
+            # ax1.plot(grd[::2][span_lri[0] + 1: span_lri[1] - 1, 0], grd[::2][span_lri[0] + 1: span_lri[1] - 1, 1],
+            #          color="purple", linewidth=3, transform=ccrs.PlateCarree())
+            # ax1.tick_params(labelsize=25, width=2.9)
+            # ax1.yaxis.get_offset_text().set_fontsize(24)
+            # ax1.scatter(113.68, 34.75, color="red", marker="*")
+            # ax1.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+            # ax1.coastlines()
+            # ax1.set_extent([80, 150, 0, 60], crs=ccrs.PlateCarree())
+            # ax1.set_xticks(np.arange(80, 150+1, 10))
+            # ax1.set_yticks(np.arange(0, 60+1, 10))
+            # ax1.set_axis_off()
+            # ax1.set_ylabel('Lat. [deg]', fontsize=20)
+            # ax1.set_xlabel('Lon. [deg]', fontsize=20)
+            # gl = ax1.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+            #                    linewidth=2, color='gray', alpha=0.5, linestyle='--',
+            #                    xlocs=np.arange(80, 150+1, 10), ylocs=np.arange(0, 60+1, 10))
+            # gl.xlabel_style = {"fontsize": 15}
+            # gl.ylabel_style = {"fontsize": 15}
+            # add_zebra_frame(ax1, crs=ccrs.PlateCarree())
+            # cbar = fig.colorbar(im, cax=ax3, aspect=2, shrink=0.5)
+            # cbar.ax.tick_params(labelsize=10)
+            # cbar.ax.set_title('EWH [mm]', fontsize=15)
+            # plt.tight_layout()
+            # plt.show()
+            np.savetxt(f"../output/{area}/{date4lgd}_{ind}_KBR.txt", np.c_[grd[::5][span_kbr[0]: span_kbr[1], 0],
+                                                                           grd[::5][span_kbr[0]: span_kbr[1], 1],
+                                                                           lgd_kbr[span_kbr[0]: span_kbr[1]]])
+            np.savetxt(f"../output/{area}/{date4lgd}_{ind}_LRI.txt", np.c_[grd[::2][span_lri[0]: span_lri[1], 0],
+                                                                           grd[::2][span_lri[0]: span_lri[1], 1],
+                                                                           lgd_lri[span_lri[0]: span_lri[1]],
+                                                                           lgd_gldas, lgd_alter])
+            # plt.savefig(f"../image/{background}/lgd_{date4lgd}_{ind}_{hydro_model}.png", dpi=600)
 
         # ASD of LGD
-        x_lri, f_lri, c_lri = lpsd(lgd_lri, windows.nuttall, 1e-4, 2e-1, 400, 100, 2, fs_lri, 0.5)
-        x_kbr, f_kbr, c_kbr = lpsd(lgd_kbr, windows.nuttall, 1e-4, 1e-1, 400, 100, 2, fs_kbr, 0.5)
-        fig, ax = plt.subplots(figsize=(16, 8))
-        ax.loglog(f_lri,
-                  np.sqrt(x_lri*c_lri['PSD']) * 1e9,
-                  linewidth=4,
-                  color='blue',
-                  label="LLGD")
-        ax.loglog(f_kbr,
-                  np.sqrt(x_kbr*c_kbr['PSD']) * 1e9,
-                  linewidth=4,
-                  color='green',
-                  label="KLGD")
-        ax.tick_params(labelsize=25, width=2.9)
-        ax.set_xlabel('Frequency [Hz]', fontsize=20)
-        ax.set_title(f"{date4lgd}", fontsize=20)
-        ax.set_xlim([1e-4, 5e-1])
-        ax.yaxis.get_offset_text().set_fontsize(24)
-        ax.set_ylabel(r'LGD [nm/s$^2 / \sqrt{Hz}$]', fontsize=20)
-        ax.legend(fontsize=15, loc='best', frameon=False)
-        ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
-        plt.setp(ax.spines.values(), linewidth=3)
-        plt.tight_layout()
+        # x_lri, f_lri, c_lri = lpsd(lgd_lri, windows.nuttall, 1e-4, 2e-1, 400, 100, 2, fs_lri, 0.5)
+        # x_kbr, f_kbr, c_kbr = lpsd(lgd_kbr, windows.nuttall, 1e-4, 1e-1, 400, 100, 2, fs_kbr, 0.5)
+        # fig, ax = plt.subplots(figsize=(16, 8))
+        # ax.loglog(f_lri,
+        #           np.sqrt(x_lri*c_lri['PSD']) * 1e9,
+        #           linewidth=4,
+        #           color='blue',
+        #           label="LLGD")
+        # ax.loglog(f_kbr,
+        #           np.sqrt(x_kbr*c_kbr['PSD']) * 1e9,
+        #           linewidth=4,
+        #           color='green',
+        #           label="KLGD")
+        # ax.tick_params(labelsize=25, width=2.9)
+        # ax.set_xlabel('Frequency [Hz]', fontsize=20)
+        # ax.set_title(f"{date4lgd}", fontsize=20)
+        # ax.set_xlim([1e-4, 5e-1])
+        # ax.yaxis.get_offset_text().set_fontsize(24)
+        # ax.set_ylabel(r'LGD [nm/s$^2 / \sqrt{Hz}$]', fontsize=20)
+        # ax.legend(fontsize=15, loc='best', frameon=False)
+        # ax.grid(True, which='both', ls='dashed', color='0.5', linewidth=0.6)
+        # plt.setp(ax.spines.values(), linewidth=3)
+        # plt.tight_layout()
         # plt.savefig(f"../image/{background}/lgd_{date4lgd}_ASD.png", dpi=600)
-        # plt.show()
+        plt.show()
 
 
 if __name__ == "__main__":
+    np.seterr(divide='ignore', invalid='ignore')
     plt.rcParams["font.sans-serif"] = ["Microsoft YaHei"]
     plt.rcParams["axes.unicode_minus"] = False
 
