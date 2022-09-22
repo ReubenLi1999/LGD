@@ -188,7 +188,7 @@ def rr2lgd(rr, fs, flag):
     filtered = f_signal * lgd_filter
     cut = irfft(filtered)
     if flag == "lri":
-        coeff = np.loadtxt("../input/highpass.fcf", dtype=np.float64, skiprows=14)
+        coeff = np.loadtxt("../input/bandpass_1mhz_20mhz_lri.fcf", dtype=np.float64, skiprows=14)
     else:
         coeff = np.loadtxt("../input/bandpass_1mhz_10mhz_kbr.fcf", dtype=np.float64, skiprows=14)
     cut = filtfilt(coeff, 1, cut)
@@ -598,7 +598,7 @@ def get_monthly_mean(year, month, flag):
 @timer
 def main():
     # date array
-    sta_date = datetime.date(2021, 8, 21)
+    sta_date = datetime.date(2021, 6, 2)
     end_date = datetime.date(2021, 8, 30)
     dates4lgd = [sta_date + datetime.timedelta(n) for n in range(int((end_date - sta_date).days))]
     # background model used
@@ -608,15 +608,15 @@ def main():
     hydro_model_alter = "GLDAS"
     # research area
     area = "europe"
-    lat_span = [31, 36.5]
-    lon_span = [112, 118]
+    # lat_span = [31, 36.5]
+    # lon_span = [112, 118]
     lat_span = [45, 54]
     lon_span = [2, 17]
     # lat_span_gldas = [0, 60]
     # lon_span_gldas = [80, 110]
     # the soil moisture of the monthly mean GLDAS
-    som_m = get_soil_moisture(background, "monthly", hydro_model)
-    som_m_alter = get_soil_moisture(background, "monthly", hydro_model_alter)
+    # som_m = get_soil_moisture(background, "monthly", hydro_model)
+    # som_m_alter = get_soil_moisture(background, "monthly", hydro_model_alter)
     # coefficients
     fs_lri = 0.5
     fs_kbr = 0.2
@@ -640,14 +640,14 @@ def main():
             if not over_area:
                 continue
             # get the soil moisture of this day
-            som_d = get_soil_moisture(date4lgd, "daily", hydro_model)
-            som_d_alter = get_soil_moisture(date4lgd, "daily", hydro_model_alter)
-            lgd_gldas = compute_lgd_from_gldas(get_soil_moisture_inc(som_m, som_d),
-                                               gnv_c[span_lri[0]: span_lri[1], :],
-                                               gnv_d[span_lri[0]: span_lri[1], :])
-            lgd_alter = compute_lgd_from_gldas(get_soil_moisture_inc(som_m_alter, som_d_alter),
-                                               gnv_c[span_lri[0]: span_lri[1], :],
-                                               gnv_d[span_lri[0]: span_lri[1], :])
+            # som_d = get_soil_moisture(date4lgd, "daily", hydro_model)
+            # som_d_alter = get_soil_moisture(date4lgd, "daily", hydro_model_alter)
+            # lgd_gldas = compute_lgd_from_gldas(get_soil_moisture_inc(som_m, som_d),
+            #                                    gnv_c[span_lri[0]: span_lri[1], :],
+            #                                    gnv_d[span_lri[0]: span_lri[1], :])
+            # lgd_alter = compute_lgd_from_gldas(get_soil_moisture_inc(som_m_alter, som_d_alter),
+            #                                    gnv_c[span_lri[0]: span_lri[1], :],
+            #                                    gnv_d[span_lri[0]: span_lri[1], :])
 
             # fig = plt.figure(figsize=(20, 8))
             # fig.suptitle(f"{date4lgd}-{ind}", fontsize=24)
@@ -709,6 +709,8 @@ def main():
             # cbar.ax.set_title('EWH [mm]', fontsize=15)
             # plt.tight_layout()
             # plt.show()
+            lgd_gldas = np.loadtxt(f"../tmp/{area}/{date4lgd}_{ind}_LRI.txt")[:, 3]
+            lgd_alter = np.loadtxt(f"../tmp/{area}/{date4lgd}_{ind}_LRI.txt")[:, 4]
             np.savetxt(f"../output/{area}/{date4lgd}_{ind}_KBR.txt", np.c_[grd[::5][span_kbr[0]: span_kbr[1], 0],
                                                                            grd[::5][span_kbr[0]: span_kbr[1], 1],
                                                                            lgd_kbr[span_kbr[0]: span_kbr[1]]])
@@ -743,7 +745,7 @@ def main():
         # plt.setp(ax.spines.values(), linewidth=3)
         # plt.tight_layout()
         # plt.savefig(f"../image/{background}/lgd_{date4lgd}_ASD.png", dpi=600)
-        plt.show()
+        # plt.show()
 
 
 if __name__ == "__main__":
